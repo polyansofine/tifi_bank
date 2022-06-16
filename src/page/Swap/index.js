@@ -53,6 +53,7 @@ const Swap = () => {
   const [swap_available, setSwapAvailable] = useState(false);
   const [status, setStatus] = useState(false);
   const dispatch = useDispatch();
+
   const { address, provider } = useSelector(
     ({ authReducers }) => authReducers.auth.auth
   );
@@ -402,7 +403,10 @@ const Swap = () => {
           alignItems="center"
           sx={{ mt: 1 }}
         >
-          <Fab size="small">
+          <Fab
+            size="small"
+            onClick={() => dispatch(fuseActions.selectToken(token1, token0))}
+          >
             <ArrowDownwardIcon />
           </Fab>
         </Grid>
@@ -421,6 +425,7 @@ const Swap = () => {
           <Grid container direction="column">
             <Grid item>
               <StyleInput
+                fullWidth
                 placeholder="0.00"
                 type="number"
                 value={price1}
