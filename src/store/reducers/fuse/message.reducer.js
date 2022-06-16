@@ -4,8 +4,8 @@ const initialState = {
   state: null,
   options: {
     anchorOrigin: {
-      vertical: "left",
-      horizontal: "right",
+      vertical: "bottom",
+      horizontal: "left",
     },
     autoHideDuration: 3000,
     message: "Hi",
