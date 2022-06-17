@@ -22,7 +22,15 @@ export const theme = createTheme({
              backgroundRepeat: no-repeat;
            backgroundAttachment: fixed;
            color:#dfd8dc;
-       }
+          }
+          input::-webkit-inner-spin-button {
+          -webkit-appearance: none;
+          margin: 0;}
+          input[type=number] {
+  -moz-appearance: textfield;
+}
+        }
+       
      `,
     },
     MuiButton: {

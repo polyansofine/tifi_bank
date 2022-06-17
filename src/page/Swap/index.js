@@ -48,8 +48,8 @@ const Swap = () => {
   const [open, setOpen] = useState(false);
   const [balance, setBalance] = useState();
   const [balance1, setBalance1] = useState();
-  const [price0, setPrice0] = useState();
-  const [price1, setPrice1] = useState();
+  const [price0, setPrice0] = useState("");
+  const [price1, setPrice1] = useState("");
   const [token_index, setTokenIndex] = useState(0);
   const [swap_available, setSwapAvailable] = useState(false);
   const [status, setStatus] = useState(false);
@@ -75,10 +75,18 @@ const Swap = () => {
   }, [address, provider, token0, token1]);
 
   const handleChange = (e, index) => {
-    console.log("index=", index, e);
+    var tmpValu1 = e.target.value.toString();
+    let tmpVlue2 = e.target.value;
+    if (tmpValu1.length > 1) {
+      if (tmpValu1.substring(0, 2) != "0.") {
+        tmpVlue2 = Number(tmpValu1);
+      }
+    }
+    console.log(tmpVlue2);
+    // console.log("index=", index, e);
     if (index === 0) {
-      setPrice0(e.target.value);
-      if (e.target.value > balance) {
+      setPrice0(tmpVlue2.toString());
+      if (tmpVlue2 > balance) {
         setSwapAvailable(false);
       } else {
         setSwapAvailable(true);
@@ -86,16 +94,16 @@ const Swap = () => {
           (token0.title === "BNB" && index === 0) ||
           (token1.title === "BNB" && index === 1)
         ) {
-          if (e.target.value > 0.04) {
+          if (tmpVlue2 > 0.04) {
             setSwapAvailable(false);
           }
         } //TODO: remove
       }
-      getTokenPrices(token0.address, e.target.value);
+      getTokenPrices(token0.address, tmpVlue2);
     } else {
-      setPrice1(e.target.value);
+      setPrice1(tmpVlue2.toString());
 
-      getTokenPrices(token1.address, e.target.value);
+      getTokenPrices(token1.address, tmpVlue2);
     }
   };
   const getBalance = async (token, index) => {
@@ -397,6 +405,7 @@ const Swap = () => {
           <Grid container direction="column">
             <Grid item>
               <StyleInput
+                step="0.000000001"
                 placeholder="0.00"
                 fullWidth
                 type="number"
@@ -460,7 +469,7 @@ const Swap = () => {
                 fullWidth
                 placeholder="0.00"
                 type="number"
-                value={price1}
+                value={parseFloat(price1).toString()}
                 onChange={(e) => handleChange(e, 1)}
               />
             </Grid>
