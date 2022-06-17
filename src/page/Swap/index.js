@@ -617,7 +617,14 @@ const Swap = () => {
                   // type="number"
                   value={
                     // price0 > 0
-                    Math.round(price0 * 1000000000) / 1000000000
+                    price0 != null
+                      ? price0.toString().split(".").length == 1
+                        ? price0
+                        : price0.toString().split(".")[0] +
+                          "." +
+                          price0.toString().split(".")[1].substring(0, 9)
+                      : null
+                    // Math.round(price0 * 1000000000) / 1000000000
                     // : null
                   }
                   onChange={(e) => handleChange(e, 0)}
@@ -678,7 +685,13 @@ const Swap = () => {
                   // type="number"
                   value={
                     // price0 > 0
-                    Math.round(price1 * 1000000000) / 1000000000
+                    price1 != null
+                      ? price1.toString().split(".").length == 1
+                        ? price1
+                        : price1.toString().split(".")[0] +
+                          "." +
+                          price1.toString().split(".")[1].substring(0, 9)
+                      : null
                     // : null
                   }
                   onChange={(e) => handleChange(e, 1)}
