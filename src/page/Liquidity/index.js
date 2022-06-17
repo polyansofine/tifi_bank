@@ -224,7 +224,7 @@ const Liquidity = () => {
                       <Typography>77777</Typography>
                     </Grid>
                     <Grid item>
-                      <Typography>cake per bnb</Typography>
+                      <Typography>TiFi per bnb</Typography>
                     </Grid>
                   </Grid>
                 </Grid>
@@ -234,7 +234,7 @@ const Liquidity = () => {
                       <Typography>77777</Typography>
                     </Grid>
                     <Grid item>
-                      <Typography>cake per bnb</Typography>
+                      <Typography>bnb per TiFi</Typography>
                     </Grid>
                   </Grid>
                 </Grid>

@@ -138,17 +138,30 @@ const Swap = () => {
   };
 
   const handleChange = (e, index) => {
-    var tmpValu1 = e.target.value.toString();
-    let tmpVlue2 = e.target.value;
-    if (tmpValu1.length > 1) {
-      if (tmpValu1.substring(0, 2) != "0.") {
-        tmpVlue2 = Number(tmpValu1);
+    let tmpVlue2;
+    const rgx = /^[0-9]*(\.\d{0,9})?$/;
+    let result = e.target.value.toString().match(rgx);
+    tmpVlue2 = result[0];
+    console.log("value==", tmpVlue2);
+    // var tmpValu1 = e.target.value.toString();
+    // if (tmpValu1.length > 1) {
+    //   if (tmpValu1.substring(0, 2) != "0.") {
+    //     tmpVlue2 = Math.round(Number(tmpValu1) * 10000000000) / 10000000000;
+    //   }
+    // }
+    if (tmpVlue2[0] == "0") {
+      if (tmpVlue2.length < 2) {
+      } else {
+        if (tmpVlue2[1] == ".") {
+        } else {
+          tmpVlue2 = tmpVlue2.substring(1);
+        }
       }
     }
 
     if (index === 0) {
       console.log("index=", tmpVlue2);
-      setPrice0((tmpVlue2 * 1).toString());
+      setPrice0(tmpVlue2);
       let balanceBuf = balance;
       if (token0.title === "BNB") {
         balanceBuf -= 0.01;
@@ -585,10 +598,10 @@ const Swap = () => {
               <StyleInput
                 placeholder="0.00"
                 fullWidth
-                type="number"
+                // type="number"
                 value={
                   // price0 > 0
-                  Math.round(price0 * 1000000000) / 1000000000
+                  price0
                   // : null
                 }
                 onChange={(e) => handleChange(e, 0)}
@@ -643,10 +656,10 @@ const Swap = () => {
               <StyleInput
                 fullWidth
                 placeholder="0.00"
-                type="number"
+                // type="number"
                 value={
-                  // price1 > 0
-                  Math.round(price1 * 1000000000) / 1000000000
+                  // price0 > 0
+                  price1
                   // : null
                 }
                 onChange={(e) => handleChange(e, 1)}
