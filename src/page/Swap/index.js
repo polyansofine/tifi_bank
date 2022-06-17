@@ -50,7 +50,7 @@ const transition = {
   ease: [0.43, 0.13, 0.23, 0.96],
 };
 const imageVariants = {
-  exit: { y: "50%", opacity: 0, transition },
+  exit: { y: "10%", opacity: 0, transition },
   enter: {
     y: "0%",
     opacity: 1,
@@ -588,169 +588,176 @@ const Swap = () => {
     );
   });
   return (
-    <motion.div variants={imageVariants}>
-      <StyledPaper main sx={{ position: "relative" }}>
-        <IconButton sx={{ position: "absolute", top: 6, right: 6 }}>
-          <SettingsOutlinedIcon sx={{ color: "#c8b6ff" }} />
-        </IconButton>
-        <Typography variant="h6" sx={{ my: 2 }}>
-          Swap
-        </Typography>
-        <StyledPaper>
-          <Grid container direction="row-reverse">
-            <CoinButton
-              onClick={() => {
-                setOpen(true);
-                setTokenIndex(0);
-              }}
-              src={`/images/tokens/${token0.address}.png`}
-            >
-              {token0.title}
-            </CoinButton>
-          </Grid>
-          <Grid container direction="column">
-            <Grid item>
-              <StyleInput
-                placeholder="0.00"
-                fullWidth
-                // type="number"
-                value={
-                  // price0 > 0
-                  Math.round(price0 * 1000000000) / 1000000000
-                  // : null
-                }
-                onChange={(e) => handleChange(e, 0)}
-              />
-            </Grid>
-
-            <Grid item>
-              <Grid
-                container
-                justifyContent="space-between"
-                alignItems="center"
+    <motion.div initial="exit" animate="enter" exit="exit">
+      <motion.div variants={imageVariants}>
+        <StyledPaper main sx={{ position: "relative" }}>
+          <IconButton sx={{ position: "absolute", top: 6, right: 6 }}>
+            <SettingsOutlinedIcon sx={{ color: "#c8b6ff" }} />
+          </IconButton>
+          <Typography variant="h6" sx={{ my: 2 }}>
+            Swap
+          </Typography>
+          <StyledPaper>
+            <Grid container direction="row-reverse">
+              <CoinButton
+                onClick={() => {
+                  setOpen(true);
+                  setTokenIndex(0);
+                }}
+                src={`/images/tokens/${token0.address}.png`}
               >
-                <Grid item>
-                  <Typography sx={{ color: "#8a817c" }}>
-                    Balance {Math.round(balance * 1000000000) / 1000000000 || 0}
-                  </Typography>
-                </Grid>
-                <Grid item>
-                  <StyleChipBtn onClick={() => handleMax(0)}>Max</StyleChipBtn>
-                </Grid>
-              </Grid>{" "}
+                {token0.title}
+              </CoinButton>
             </Grid>
-          </Grid>
-        </StyledPaper>
-        <Grid
-          container
-          justifyContent="center"
-          alignItems="center"
-          sx={{ mt: 1 }}
-        >
-          <Fab
-            size="small"
-            onClick={() => dispatch(fuseActions.selectToken(token1, token0))}
+            <Grid container direction="column">
+              <Grid item>
+                <StyleInput
+                  placeholder="0.00"
+                  fullWidth
+                  // type="number"
+                  value={
+                    // price0 > 0
+                    Math.round(price0 * 1000000000) / 1000000000
+                    // : null
+                  }
+                  onChange={(e) => handleChange(e, 0)}
+                />
+              </Grid>
+
+              <Grid item>
+                <Grid
+                  container
+                  justifyContent="space-between"
+                  alignItems="center"
+                >
+                  <Grid item>
+                    <Typography sx={{ color: "#8a817c" }}>
+                      Balance{" "}
+                      {Math.round(balance * 1000000000) / 1000000000 || 0}
+                    </Typography>
+                  </Grid>
+                  <Grid item>
+                    <StyleChipBtn onClick={() => handleMax(0)}>
+                      Max
+                    </StyleChipBtn>
+                  </Grid>
+                </Grid>{" "}
+              </Grid>
+            </Grid>
+          </StyledPaper>
+          <Grid
+            container
+            justifyContent="center"
+            alignItems="center"
+            sx={{ mt: 1 }}
           >
-            <ArrowDownwardIcon />
-          </Fab>
-        </Grid>
-        <StyledPaper sx={{ mt: 1 }}>
-          <Grid container direction="row-reverse">
-            <CoinButton
-              onClick={() => {
-                setOpen(true);
-                setTokenIndex(1);
-              }}
-              src={`/images/tokens/${token1.address}.png`}
+            <Fab
+              size="small"
+              onClick={() => dispatch(fuseActions.selectToken(token1, token0))}
             >
-              {token1.title}
-            </CoinButton>
+              <ArrowDownwardIcon />
+            </Fab>
           </Grid>
-          <Grid container direction="column">
-            <Grid item>
-              <StyleInput
-                fullWidth
-                placeholder="0.00"
-                // type="number"
-                value={
-                  // price0 > 0
-                  Math.round(price1 * 1000000000) / 1000000000
-                  // : null
-                }
-                onChange={(e) => handleChange(e, 1)}
-              />
+          <StyledPaper sx={{ mt: 1 }}>
+            <Grid container direction="row-reverse">
+              <CoinButton
+                onClick={() => {
+                  setOpen(true);
+                  setTokenIndex(1);
+                }}
+                src={`/images/tokens/${token1.address}.png`}
+              >
+                {token1.title}
+              </CoinButton>
             </Grid>
-            {/* <Grid item>
+            <Grid container direction="column">
+              <Grid item>
+                <StyleInput
+                  fullWidth
+                  placeholder="0.00"
+                  // type="number"
+                  value={
+                    // price0 > 0
+                    Math.round(price1 * 1000000000) / 1000000000
+                    // : null
+                  }
+                  onChange={(e) => handleChange(e, 1)}
+                />
+              </Grid>
+              {/* <Grid item>
               {" "}
               <Typography sx={{ color: "#c8b6ff" }}>$1800</Typography>
             </Grid> */}
-            <Grid item>
-              <Grid
-                container
-                justifyContent="space-between"
-                alignItems="center"
-              >
-                <Grid item>
-                  <Typography sx={{ color: "#8a817c" }}>
-                    Balance{" "}
-                    {Math.round(balance1 * 1000000000) / 1000000000 || 0}
-                  </Typography>
-                </Grid>
-                <Grid item>
-                  <StyleChipBtn onClick={() => handleMax(1)}>Max</StyleChipBtn>
+              <Grid item>
+                <Grid
+                  container
+                  justifyContent="space-between"
+                  alignItems="center"
+                >
+                  <Grid item>
+                    <Typography sx={{ color: "#8a817c" }}>
+                      Balance{" "}
+                      {Math.round(balance1 * 1000000000) / 1000000000 || 0}
+                    </Typography>
+                  </Grid>
+                  <Grid item>
+                    <StyleChipBtn onClick={() => handleMax(1)}>
+                      Max
+                    </StyleChipBtn>
+                  </Grid>
                 </Grid>
               </Grid>
             </Grid>
-          </Grid>
-        </StyledPaper>
-        {address ? (
-          !price0 ? (
-            <Button
-              fullWidth
-              sx={{
-                background: theme.custom.gradient.pink,
-                height: "50px",
-                my: 2,
-              }}
-            >
-              Enter Amount
-            </Button>
-          ) : !balance_avaliable || !reserve_available ? (
-            <Button
-              fullWidth
-              sx={{
-                background: theme.custom.gradient.grey,
-                height: "50px",
-                my: 2,
-              }}
-            >
-              {!reserve_available
-                ? "Insufficient Liquidity for This Trade"
-                : "Insufficient Balance"}
-            </Button>
+          </StyledPaper>
+          {address ? (
+            !price0 ? (
+              <Button
+                fullWidth
+                sx={{
+                  background: theme.custom.gradient.pink,
+                  height: "50px",
+                  my: 2,
+                }}
+              >
+                Enter Amount
+              </Button>
+            ) : !balance_avaliable || !reserve_available ? (
+              <Button
+                fullWidth
+                sx={{
+                  background: theme.custom.gradient.grey,
+                  height: "50px",
+                  my: 2,
+                }}
+              >
+                {!reserve_available
+                  ? "Insufficient Liquidity for This Trade"
+                  : "Insufficient Balance"}
+              </Button>
+            ) : (
+              <Button
+                onClick={handleSwap}
+                disabled={status}
+                fullWidth
+                sx={{
+                  background: theme.custom.gradient.green,
+                  height: "50px",
+                  my: 2,
+                }}
+              >
+                {status ? <CircularProgress /> : "Swap"}
+              </Button>
+            )
           ) : (
-            <Button
-              onClick={handleSwap}
-              disabled={status}
-              fullWidth
-              sx={{
-                background: theme.custom.gradient.green,
-                height: "50px",
-                my: 2,
-              }}
-            >
-              {status ? <CircularProgress /> : "Swap"}
-            </Button>
-          )
-        ) : (
-          <WalletConnect type />
-        )}
-      </StyledPaper>
-      <TokenSearchModal
-        open={open}
-        handleClose={() => setOpen(false)}
-        token_index={token_index}
-      />
+            <WalletConnect type />
+          )}
+        </StyledPaper>
+        <TokenSearchModal
+          open={open}
+          handleClose={() => setOpen(false)}
+          token_index={token_index}
+        />
+      </motion.div>
     </motion.div>
   );
 };
