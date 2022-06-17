@@ -9,6 +9,7 @@ import Swap from "./page/Swap";
 import { Provider } from "react-redux";
 import store from "./store/store";
 import FuseMessage from "./components/FuseMessage/FuseMessage";
+import Liquidity from "./page/Liquidity";
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/swap" element={<Swap />} />
+              <Route path="/liquidity" element={<Liquidity />} />
               {/* <Route path="/" element={<Home />} />
             <Route path="/" element={<Home />} />
             <Route path="/" element={<Home />} /> */}

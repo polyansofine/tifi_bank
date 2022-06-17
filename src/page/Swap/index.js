@@ -9,6 +9,7 @@ import {
   useTheme,
   IconButton,
   CircularProgress,
+  Chip,
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
@@ -47,8 +48,8 @@ const Swap = () => {
   const [open, setOpen] = useState(false);
   const [balance, setBalance] = useState();
   const [balance1, setBalance1] = useState();
-  const [price0, setPrice0] = useState(0);
-  const [price1, setPrice1] = useState(0);
+  const [price0, setPrice0] = useState();
+  const [price1, setPrice1] = useState();
   const [token_index, setTokenIndex] = useState(0);
   const [swap_available, setSwapAvailable] = useState(false);
   const [status, setStatus] = useState(false);
@@ -357,6 +358,21 @@ const Swap = () => {
       </Button>
     );
   });
+
+  const StyleChipBtn = React.forwardRef(({ children, ...rest }, ref) => {
+    return (
+      <Button
+        {...rest}
+        variant="outlined"
+        ref={ref}
+        color="info"
+        sx={{ color: theme.palette.info.main }}
+        size="small"
+      >
+        {children}
+      </Button>
+    );
+  });
   return (
     <div>
       <StyledPaper main sx={{ position: "relative" }}>
@@ -390,10 +406,26 @@ const Swap = () => {
             </Grid>
 
             <Grid item>
-              {" "}
-              <Typography sx={{ color: "#8a817c" }}>
-                Balance {balance || 0}
-              </Typography>
+              <Grid
+                container
+                justifyContent="space-between"
+                alignItems="center"
+              >
+                <Grid item>
+                  <Typography sx={{ color: "#8a817c" }}>
+                    Balance {balance || 0}
+                  </Typography>
+                </Grid>
+                <Grid item>
+                  <StyleChipBtn
+                    onClick={() => {
+                      console.log("hello");
+                    }}
+                  >
+                    Max
+                  </StyleChipBtn>
+                </Grid>
+              </Grid>{" "}
             </Grid>
           </Grid>
         </StyledPaper>
@@ -437,9 +469,26 @@ const Swap = () => {
               <Typography sx={{ color: "#c8b6ff" }}>$1800</Typography>
             </Grid> */}
             <Grid item>
-              <Typography sx={{ color: "#8a817c" }}>
-                Balance {balance1 || 0}
-              </Typography>
+              <Grid
+                container
+                justifyContent="space-between"
+                alignItems="center"
+              >
+                <Grid item>
+                  <Typography sx={{ color: "#8a817c" }}>
+                    Balance {balance1 || 0}
+                  </Typography>
+                </Grid>
+                <Grid item>
+                  <StyleChipBtn
+                    onClick={() => {
+                      console.log("hello");
+                    }}
+                  >
+                    Max
+                  </StyleChipBtn>
+                </Grid>
+              </Grid>
             </Grid>
           </Grid>
         </StyledPaper>
@@ -464,7 +513,7 @@ const Swap = () => {
                 my: 2,
               }}
             >
-              Insufficiant Balance
+              Insufficient Balance
             </Button>
           ) : (
             <Button
