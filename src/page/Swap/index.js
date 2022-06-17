@@ -24,6 +24,7 @@ import getPrice from "../../config/abi/GetPrice.json";
 import WalletConnect from "../../components/WalletConnect";
 import * as fuseActions from "../../store/actions";
 import RouterABI from "../../config/abi/TiFiRouter.json";
+import { motion } from "framer-motion/dist/framer-motion";
 
 const StyledPaper = styled(Paper)(({ theme, main }) => ({
   width: main ? 500 : "100%",
@@ -43,6 +44,19 @@ const StyleInput = styled(InputBase)(({ theme }) => ({
   fontSize: "24px",
   color: "#edf2f4",
 }));
+
+const transition = {
+  duration: 1,
+  ease: [0.43, 0.13, 0.23, 0.96],
+};
+const imageVariants = {
+  exit: { y: "50%", opacity: 0, transition },
+  enter: {
+    y: "0%",
+    opacity: 1,
+    transition,
+  },
+};
 
 const Swap = () => {
   const theme = useTheme();
@@ -81,6 +95,7 @@ const Swap = () => {
 
   const handleMax = async (index) => {
     if (index === 0) {
+      setBalanceAvailable(true);
       if (token0.title === "BNB") {
         setPrice0(balance - 0.01 <= 0 ? 0 : balance - 0.01);
 
@@ -573,7 +588,7 @@ const Swap = () => {
     );
   });
   return (
-    <div>
+    <motion.div variants={imageVariants}>
       <StyledPaper main sx={{ position: "relative" }}>
         <IconButton sx={{ position: "absolute", top: 6, right: 6 }}>
           <SettingsOutlinedIcon sx={{ color: "#c8b6ff" }} />
@@ -601,7 +616,7 @@ const Swap = () => {
                 // type="number"
                 value={
                   // price0 > 0
-                  price0
+                  Math.round(price0 * 1000000000) / 1000000000
                   // : null
                 }
                 onChange={(e) => handleChange(e, 0)}
@@ -659,7 +674,7 @@ const Swap = () => {
                 // type="number"
                 value={
                   // price0 > 0
-                  price1
+                  Math.round(price1 * 1000000000) / 1000000000
                   // : null
                 }
                 onChange={(e) => handleChange(e, 1)}
@@ -736,7 +751,7 @@ const Swap = () => {
         handleClose={() => setOpen(false)}
         token_index={token_index}
       />
-    </div>
+    </motion.div>
   );
 };
 
