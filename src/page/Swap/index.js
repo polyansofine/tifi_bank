@@ -24,6 +24,7 @@ import getPrice from "../../config/abi/GetPrice.json";
 import WalletConnect from "../../components/WalletConnect";
 import * as fuseActions from "../../store/actions";
 import RouterABI from "../../config/abi/TiFiRouter.json";
+
 const StyledPaper = styled(Paper)(({ theme, main }) => ({
   width: main ? 500 : "100%",
   padding: "10px 18px",
@@ -51,7 +52,8 @@ const Swap = () => {
   const [price0, setPrice0] = useState("");
   const [price1, setPrice1] = useState("");
   const [token_index, setTokenIndex] = useState(0);
-  const [swap_available, setSwapAvailable] = useState(false);
+  const [reserve_available, setReserveAvailable] = useState(false);
+  const [balance_avaliable, setBalanceAvailable] = useState(false);
   const [status, setStatus] = useState(false);
   const dispatch = useDispatch();
 
@@ -61,18 +63,79 @@ const Swap = () => {
   const { token0, token1 } = useSelector(
     ({ tokenReducers }) => tokenReducers.token
   );
-
+  const { reserve0, reserve1 } = useSelector(
+    ({ tokenReducers }) => tokenReducers.token
+  );
   useEffect(() => {
     const getData = async () => {
       setPrice0(0);
       setPrice1(0);
       await getBalance(token0, 0);
       await getBalance(token1, 1);
+      await getTokenReserves(token0.address, token1.address);
     };
     if (address && provider) {
       getData();
     }
   }, [address, provider, token0, token1]);
+
+  const handleMax = async (index) => {
+    if (index === 0) {
+      if (token0.title === "BNB") {
+        setPrice0(balance - 0.01 <= 0 ? 0 : balance - 0.01);
+
+        if (balance - 0.01 > reserve0 * 0.9) {
+          setReserveAvailable(false);
+        } else {
+          setReserveAvailable(true);
+        }
+        //TODO: remove
+
+        getTokenPrices(
+          token0.address,
+          balance - 0.01 <= 0 ? 0 : balance - 0.01
+        );
+      } else {
+        setPrice0(balance);
+        if (balance > reserve0 * 0.9) {
+          setReserveAvailable(false);
+        } else {
+          setReserveAvailable(true);
+        }
+        getTokenPrices(token0.address, balance);
+      }
+    } else if (index === 1) {
+      let priceBuf;
+      if (token1.title === "BNB") {
+        setPrice1(balance1 - 0.01 <= 0 ? 0 : balance1 - 0.01);
+        priceBuf = await getTokenPrices(
+          token1.address,
+          balance1 - 0.01 <= 0 ? 0 : balance1 - 0.01
+        );
+      } else {
+        setPrice1(balance1);
+        priceBuf = await getTokenPrices(token1.address, balance1);
+      }
+      if (token0.title === "BNB") {
+        if (priceBuf > balance - 0.01) {
+          setBalanceAvailable(false);
+        } else {
+          setBalanceAvailable(true);
+        }
+      } else {
+        if (priceBuf > balance) {
+          setBalanceAvailable(false);
+        } else {
+          setBalanceAvailable(true);
+        }
+      }
+      if (priceBuf > reserve0 * 0.9) {
+        setReserveAvailable(false);
+      } else {
+        setReserveAvailable(true);
+      }
+    }
+  };
 
   const handleChange = (e, index) => {
     var tmpValu1 = e.target.value.toString();
@@ -82,27 +145,45 @@ const Swap = () => {
         tmpVlue2 = Number(tmpValu1);
       }
     }
-    console.log(tmpVlue2);
-    // console.log("index=", index, e);
+
     if (index === 0) {
-      setPrice0(tmpVlue2.toString());
-      if (tmpVlue2 > balance) {
-        setSwapAvailable(false);
+      console.log("index=", tmpVlue2);
+      setPrice0((tmpVlue2 * 1).toString());
+      let balanceBuf = balance;
+      if (token0.title === "BNB") {
+        balanceBuf -= 0.01;
+      }
+      if (tmpVlue2 > balanceBuf) {
+        setBalanceAvailable(false);
       } else {
-        setSwapAvailable(true);
-        if (
-          (token0.title === "BNB" && index === 0) ||
-          (token1.title === "BNB" && index === 1)
-        ) {
-          if (tmpVlue2 > 0.04) {
-            setSwapAvailable(false);
-          }
-        } //TODO: remove
+        setBalanceAvailable(true);
+        if (tmpVlue2 > reserve0 * 0.9) {
+          console.log("reserve0val==", tmpVlue2);
+          setReserveAvailable(false);
+        } else {
+          setReserveAvailable(true);
+        }
+        //TODO: remove
       }
       getTokenPrices(token0.address, tmpVlue2);
     } else {
       setPrice1(tmpVlue2.toString());
+      let balanceBuf = balance1;
+      if (token1.title === "BNB") {
+        balanceBuf -= 0.01;
+      }
+      if (tmpVlue2 > balanceBuf) {
+        setBalanceAvailable(false);
+      } else {
+        setBalanceAvailable(true);
 
+        if (tmpVlue2 > reserve1 * 0.9) {
+          setReserveAvailable(false);
+        } else {
+          setReserveAvailable(true);
+        }
+        //TODO: remove
+      }
       getTokenPrices(token1.address, tmpVlue2);
     }
   };
@@ -139,6 +220,35 @@ const Swap = () => {
       return 0;
     }
   };
+  const getTokenReserves = async (address0, address1) => {
+    if (provider) {
+      const signer = provider.getSigner();
+      let contractPrice = new ethers.Contract(
+        CONTRACT_ADDRESS.GET_PRICE_ADDRESS,
+        getPrice.abi,
+        signer
+      );
+      if (address1 && address0 && address !== null) {
+        try {
+          const PriveVal = await contractPrice.getReserves(address0, address1);
+          console.log("prive====", PriveVal[0] / 10 ** 18);
+          dispatch(
+            fuseActions.getReserves(
+              PriveVal[0] / 10 ** 18,
+              PriveVal[1] / 10 ** 18
+            )
+          );
+        } catch (error) {
+          dispatch(
+            fuseActions.showMessage({
+              message: error.data ? error.data.message : error.message,
+              variant: "error",
+            })
+          );
+        }
+      }
+    }
+  };
 
   async function getTokenPrices(addresfrom, amount) {
     // const chainId = 97;
@@ -160,7 +270,6 @@ const Swap = () => {
         }
         try {
           if (addresfrom === token0.address) {
-            console.log("address=", addresfrom, _amount, token1);
             const PriveVal = await contractPrice.getTokenPriceUsingAmount(
               addresfrom,
               token1.address,
@@ -242,6 +351,9 @@ const Swap = () => {
                 variant: "success",
               })
             );
+            await getBalance(token0, 0);
+            await getBalance(token1, 1);
+            await getTokenReserves(token0.address, token1.address);
             setStatus(false);
             // setSwaps({ ...swaps });
           } catch (error) {
@@ -258,76 +370,142 @@ const Swap = () => {
             // setSwaps({ ...swaps });
           }
         } else {
-          try {
-            let _amount;
-            if (Number(price0) < 100) {
-              _amount = (Number(price0) * 10 ** 18).toString();
-            } else {
-              _amount = parseInt(price0).toString() + "000000000000000000";
-            }
-            const PriveVal = await contract0.allowance(
-              address,
-              CONTRACT_ADDRESS.ROUTER_ADDRESS
-            );
-            console.log("PriveVal==", price0);
-            let nftTxn;
-            if (Number(PriveVal._hex) / 10 ** 18 < Number(price0)) {
-              console.log("PriveVal==", Number(PriveVal._hex));
-              console.log("PriveVal1==", price0);
-              let nftTxnApprove = await contract0.approve(
-                CONTRACT_ADDRESS.ROUTER_ADDRESS,
-                "1000000000000000000000000000000000000"
-              );
-              nftTxnApprove.wait();
-              let _interVal = setInterval(async () => {
-                const PriveValBuf = await contract0.allowance(
-                  address,
-                  CONTRACT_ADDRESS.ROUTER_ADDRESS
-                );
-                if (Number(PriveValBuf._hex) / 10 ** 18 > Number(price0)) {
-                  nftTxn = await contractPrice.swapExactTokensForETH(
-                    _amount,
-                    0,
-                    [token0.address, token1.address],
-                    address,
-                    deadline
-                  );
-                  clearInterval(_interVal);
-                }
-              }, 3000);
-            } else {
-              console.log("txn===", "helelel");
-              nftTxn = await contractPrice.swapExactTokensForETH(
-                _amount,
-                0,
-                [token0.address, token1.address],
+          if (token1.title === "BNB") {
+            try {
+              let _amount;
+              if (Number(price0) < 100) {
+                _amount = (Number(price0) * 10 ** 18).toString();
+              } else {
+                _amount = parseInt(price0).toString() + "000000000000000000";
+              }
+              const PriveVal = await contract0.allowance(
                 address,
-                deadline
+                CONTRACT_ADDRESS.ROUTER_ADDRESS
               );
-              console.log("txn===", nftTxn);
-            }
+              console.log("PriveVal==", price0);
+              let nftTxn;
+              if (Number(PriveVal._hex) / 10 ** 18 < Number(price0)) {
+                console.log("PriveVal==", Number(PriveVal._hex));
+                console.log("PriveVal1==", price0);
+                let nftTxnApprove = await contract0.approve(
+                  CONTRACT_ADDRESS.ROUTER_ADDRESS,
+                  "1000000000000000000000000000000000000"
+                );
+                nftTxnApprove.wait();
+                let _interVal = setInterval(async () => {
+                  const PriveValBuf = await contract0.allowance(
+                    address,
+                    CONTRACT_ADDRESS.ROUTER_ADDRESS
+                  );
+                  if (Number(PriveValBuf._hex) / 10 ** 18 > Number(price0)) {
+                    clearInterval(_interVal);
+                  }
+                }, 3000);
+              } else {
+                console.log("txn===", "helelel");
+                nftTxn = await contractPrice.swapExactTokensForETH(
+                  _amount,
+                  0,
+                  [token0.address, token1.address],
+                  address,
+                  deadline
+                );
+                console.log("txn===", nftTxn);
+              }
 
-            await nftTxn.wait();
-            setPrice0(0);
-            setPrice1(0);
-            dispatch(
-              fuseActions.showMessage({
-                message: "swap success",
-                variant: "success",
-              })
-            );
-            setStatus(false);
-          } catch (error) {
-            console.log("error===", error);
-            setPrice0(0);
-            setPrice1(0);
-            dispatch(
-              fuseActions.showMessage({
-                message: error.data ? error.data.message : error.message,
-                variant: "error",
-              })
-            );
-            setStatus(false);
+              await nftTxn.wait();
+              setPrice0(0);
+              setPrice1(0);
+              dispatch(
+                fuseActions.showMessage({
+                  message: "swap success",
+                  variant: "success",
+                })
+              );
+              await getBalance(token0, 0);
+              await getBalance(token1, 1);
+              await getTokenReserves(token0.address, token1.address);
+              setStatus(false);
+            } catch (error) {
+              console.log("error===", error);
+              setPrice0(0);
+              setPrice1(0);
+              dispatch(
+                fuseActions.showMessage({
+                  message: error.data ? error.data.message : error.message,
+                  variant: "error",
+                })
+              );
+              setStatus(false);
+            }
+          } else {
+            try {
+              let _amount;
+              if (Number(price0) < 100) {
+                _amount = (Number(price0) * 10 ** 18).toString();
+              } else {
+                _amount = parseInt(price0).toString() + "000000000000000000";
+              }
+              const PriveVal = await contract0.allowance(
+                address,
+                CONTRACT_ADDRESS.ROUTER_ADDRESS
+              );
+              console.log("PriveVal==", price0);
+              let nftTxn;
+              if (Number(PriveVal._hex) / 10 ** 18 < Number(price0)) {
+                console.log("PriveVal==", Number(PriveVal._hex));
+                console.log("PriveVal1==", price0);
+                let nftTxnApprove = await contract0.approve(
+                  CONTRACT_ADDRESS.ROUTER_ADDRESS,
+                  "1000000000000000000000000000000000000"
+                );
+                nftTxnApprove.wait();
+                let _interVal = setInterval(async () => {
+                  const PriveValBuf = await contract0.allowance(
+                    address,
+                    CONTRACT_ADDRESS.ROUTER_ADDRESS
+                  );
+                  if (Number(PriveValBuf._hex) / 10 ** 18 > Number(price0)) {
+                    clearInterval(_interVal);
+                  }
+                }, 3000);
+              } else {
+                console.log("txn===", "helelel");
+                nftTxn = await contractPrice.swapExactTokensForTokens(
+                  _amount,
+                  0,
+                  [token0.address, token1.address],
+                  address,
+                  deadline
+                );
+                console.log("txn===", nftTxn);
+              }
+
+              await nftTxn.wait();
+              setPrice0(0);
+              setPrice1(0);
+              dispatch(
+                fuseActions.showMessage({
+                  message: "swap success",
+                  variant: "success",
+                })
+              );
+              await getBalance(token0, 0);
+              await getBalance(token1, 1);
+              await getTokenReserves(token0.address, token1.address);
+              setStatus(false);
+            } catch (error) {
+              console.log("error===", error);
+              setPrice0(0);
+              setPrice1(0);
+              dispatch(
+                fuseActions.showMessage({
+                  message: error.data ? error.data.message : error.message,
+                  variant: "error",
+                })
+              );
+              setStatus(false);
+            }
           }
         }
       }
@@ -405,11 +583,14 @@ const Swap = () => {
           <Grid container direction="column">
             <Grid item>
               <StyleInput
-                step="0.000000001"
                 placeholder="0.00"
                 fullWidth
                 type="number"
-                value={price0}
+                value={
+                  // price0 > 0
+                  Math.round(price0 * 1000000000) / 1000000000
+                  // : null
+                }
                 onChange={(e) => handleChange(e, 0)}
               />
             </Grid>
@@ -422,17 +603,11 @@ const Swap = () => {
               >
                 <Grid item>
                   <Typography sx={{ color: "#8a817c" }}>
-                    Balance {balance || 0}
+                    Balance {Math.round(balance * 1000000000) / 1000000000 || 0}
                   </Typography>
                 </Grid>
                 <Grid item>
-                  <StyleChipBtn
-                    onClick={() => {
-                      console.log("hello");
-                    }}
-                  >
-                    Max
-                  </StyleChipBtn>
+                  <StyleChipBtn onClick={() => handleMax(0)}>Max</StyleChipBtn>
                 </Grid>
               </Grid>{" "}
             </Grid>
@@ -469,7 +644,11 @@ const Swap = () => {
                 fullWidth
                 placeholder="0.00"
                 type="number"
-                value={parseFloat(price1).toString()}
+                value={
+                  // price1 > 0
+                  Math.round(price1 * 1000000000) / 1000000000
+                  // : null
+                }
                 onChange={(e) => handleChange(e, 1)}
               />
             </Grid>
@@ -485,17 +664,12 @@ const Swap = () => {
               >
                 <Grid item>
                   <Typography sx={{ color: "#8a817c" }}>
-                    Balance {balance1 || 0}
+                    Balance{" "}
+                    {Math.round(balance1 * 1000000000) / 1000000000 || 0}
                   </Typography>
                 </Grid>
                 <Grid item>
-                  <StyleChipBtn
-                    onClick={() => {
-                      console.log("hello");
-                    }}
-                  >
-                    Max
-                  </StyleChipBtn>
+                  <StyleChipBtn onClick={() => handleMax(1)}>Max</StyleChipBtn>
                 </Grid>
               </Grid>
             </Grid>
@@ -513,7 +687,7 @@ const Swap = () => {
             >
               Enter Amount
             </Button>
-          ) : !swap_available ? (
+          ) : !balance_avaliable || !reserve_available ? (
             <Button
               fullWidth
               sx={{
@@ -522,7 +696,9 @@ const Swap = () => {
                 my: 2,
               }}
             >
-              Insufficient Balance
+              {!reserve_available
+                ? "Insufficient Liquidity for This Trade"
+                : "Insufficient Balance"}
             </Button>
           ) : (
             <Button

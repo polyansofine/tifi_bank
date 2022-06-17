@@ -127,7 +127,28 @@ const Liquidity = () => {
             </Grid>
           </Grid>
         </StyledInnerPaper>
-        <Fab
+        <div style={{ position: "relative" }}>
+          <Box
+            sx={{
+              border: "3px solid #161522",
+              color: "grey",
+
+              width: "65px",
+              height: "65px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              borderRadius: "50%",
+              backgroundColor: "#202231",
+              position: "absolute",
+              top: "-25px",
+              left: "30px",
+            }}
+          >
+            <AddIcon color="secondary" />
+          </Box>
+        </div>
+        {/* <Fab
           sx={{
             backgroundColor: "#202231",
             color: "grey",
@@ -136,8 +157,8 @@ const Liquidity = () => {
           }}
         >
           <AddIcon color="secondary" />
-        </Fab>
-        <StyledInnerPaper>
+        </Fab> */}
+        <StyledInnerPaper sx={{ mt: 3 }}>
           <Grid container columnSpacing={4}>
             <Grid item md={4}>
               <Grid container alignItems="center" columnSpacing={1}>
