@@ -158,12 +158,7 @@ const Swap = () => {
     let result = e.target.value.toString().match(rgx);
     tmpVlue2 = result[0];
     console.log("value==", tmpVlue2);
-    // var tmpValu1 = e.target.value.toString();
-    // if (tmpValu1.length > 1) {
-    //   if (tmpValu1.substring(0, 2) != "0.") {
-    //     tmpVlue2 = Math.round(Number(tmpValu1) * 10000000000) / 10000000000;
-    //   }
-    // }
+    
     if (tmpVlue2[0] == "0") {
       if (tmpVlue2.length < 2) {
       } else {
@@ -431,13 +426,14 @@ const Swap = () => {
                 }, 3000);
               } else {
                 console.log("txn===", "helelel");
-                nftTxn = await contractPrice.swapExactTokensForETH(
-                  _amount,
-                  0,
-                  [token0.address, token1.address],
-                  address,
-                  deadline
-                );
+                nftTxn =
+                  await contractPrice.swapExactTokensForETHSupportingFeeOnTransferTokens(
+                    _amount,
+                    0,
+                    [token0.address, token1.address],
+                    address,
+                    deadline
+                  );
                 console.log("txn===", nftTxn);
               }
 
@@ -499,13 +495,14 @@ const Swap = () => {
                 }, 3000);
               } else {
                 console.log("txn===", "helelel");
-                nftTxn = await contractPrice.swapExactTokensForTokens(
-                  _amount,
-                  0,
-                  [token0.address, token1.address],
-                  address,
-                  deadline
-                );
+                nftTxn =
+                  await contractPrice.swapExactTokensForTokensSupportingFeeOnTransferTokens(
+                    _amount,
+                    0,
+                    [token0.address, token1.address],
+                    address,
+                    deadline
+                  );
                 console.log("txn===", nftTxn);
               }
 
