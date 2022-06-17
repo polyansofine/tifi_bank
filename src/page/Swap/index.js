@@ -682,7 +682,6 @@ const Swap = () => {
                 <StyleInput
                   fullWidth
                   placeholder="0.00"
-                  // type="number"
                   value={
                     // price0 > 0
                     price1 != null
