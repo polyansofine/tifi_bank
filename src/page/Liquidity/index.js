@@ -36,6 +36,7 @@ import * as fuseActions from "../../store/actions";
 import { minABI } from "../../config/TiFI_min_abi";
 import metamask from "../../assets/image/Metamask-icon.svg";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
+import RouterABI from "../../config/abi/TiFiRouter.json";
 
 let i = 0;
 const transition = {
@@ -345,7 +346,220 @@ const Liquidity = () => {
   const handleTooltipClose = () => {
     setCopy(false);
   };
+  const handleApprove = async (address, index) => {
+    try {
+      const signer = provider.getSigner();
+      let contract0 = new ethers.Contract(address, minABI, signer);
 
+      let nftTxnApprove = await contract0.approve(
+        CONTRACT_ADDRESS.ROUTER_ADDRESS,
+        "1000000000000000000000000000000000000"
+      );
+      await nftTxnApprove.wait();
+      if (index == 0) {
+        setAllow0(false);
+      } else {
+        setAllow1(false);
+      }
+    } catch (error) {}
+  };
+
+  const handleSupply = async () => {
+    //  setStatus(true);
+    // const provider = new ethers.providers.Web3Provider(window.ethereum);
+    const signer = provider.getSigner();
+    let contractPrice = new ethers.Contract(
+      CONTRACT_ADDRESS.ROUTER_ADDRESS,
+      RouterABI.abi,
+      signer
+    );
+    //  let contract0 = new ethers.Contract(token0.address, minABI, signer);
+
+    let dateInAWeek = new Date();
+    const deadline = Math.floor(dateInAWeek.getTime() / 1000) + 1000000;
+    try {
+      if (address != null) {
+        if (token0.title === "BNB") {
+          try {
+            let _amount;
+            if (Number(price1) < 100) {
+              _amount = (Number(price1) * 10 ** 18).toString();
+            } else {
+              _amount = parseInt(price1).toString() + "000000000000000000";
+            }
+            let nftTxn = await contractPrice.addLiquidityETH(
+              token0.address,
+              _amount,
+              0,
+              0,
+              address,
+              deadline,
+              {
+                value: ethers.utils.parseUnits(
+                  Number(price0).toString(),
+                  "ether"
+                )._hex,
+              }
+            );
+            await nftTxn.wait();
+            setPrice0(0);
+            setPrice1(0);
+            dispatch(
+              fuseActions.showMessage({
+                message: "Liquidity success",
+                variant: "success",
+              })
+            );
+            await getBalance(token0, 0);
+            await getBalance(token1, 1);
+            await getTokenReserves(token0.address, token1.address);
+            await getPerPrice(token0.address, token1.address);
+            //  setStatus(false);
+            // setSwaps({ ...swaps });
+          } catch (error) {
+            setPrice0(0);
+            setPrice1(0);
+            dispatch(
+              fuseActions.showMessage({
+                message: error.data ? error.data.message : error.message,
+                variant: "error",
+              })
+            );
+            //  setStatus(false);
+
+            // setSwaps({ ...swaps });
+          }
+        } else {
+          if (token1.title === "BNB") {
+            try {
+              let _amount;
+              if (Number(price0) < 100) {
+                _amount = (Number(price0) * 10 ** 18).toString();
+              } else {
+                _amount = parseInt(price0).toString() + "000000000000000000";
+              }
+              //  const PriveVal = await contract0.allowance(
+              //    address,
+              //    CONTRACT_ADDRESS.ROUTER_ADDRESS
+              //  );
+              console.log("PriveVal==", price0);
+              let nftTxn;
+
+              nftTxn = await contractPrice.addLiquidityETH(
+                token1.address,
+                _amount,
+                0,
+                0,
+                address,
+                deadline,
+                {
+                  value: ethers.utils.parseUnits(
+                    Number(price1).toString(),
+                    "ether"
+                  )._hex,
+                }
+              );
+              //  console.log("txn===", "helelel");
+              console.log("txn===", nftTxn);
+
+              await nftTxn.wait();
+              setPrice0(0);
+              setPrice1(0);
+              dispatch(
+                fuseActions.showMessage({
+                  message: "swap success",
+                  variant: "success",
+                })
+              );
+              await getBalance(token0, 0);
+              await getBalance(token1, 1);
+              await getTokenReserves(token0.address, token1.address);
+              await getPerPrice(token0.address, token1.address);
+
+              //  setStatus(false);
+            } catch (error) {
+              console.log("error===", error);
+              setPrice0(0);
+              setPrice1(0);
+              dispatch(
+                fuseActions.showMessage({
+                  message: error.data ? error.data.message : error.message,
+                  variant: "error",
+                })
+              );
+              //  setStatus(false);
+            }
+          } else {
+            try {
+              let _amount;
+              if (Number(price0) < 100) {
+                _amount = (Number(price0) * 10 ** 18).toString();
+              } else {
+                _amount = parseInt(price0).toString() + "000000000000000000";
+              }
+              let _amount1;
+              if (Number(price1) < 100) {
+                _amount1 = (Number(price1) * 10 ** 18).toString();
+              } else {
+                _amount1 = parseInt(price1).toString() + "000000000000000000";
+              }
+
+              let nftTxn;
+
+              nftTxn = await contractPrice.addLiquidity(
+                token0.address,
+                token1.address,
+                _amount,
+                _amount1,
+                0,
+                0,
+                address,
+                deadline
+              );
+              console.log("txn===", nftTxn);
+
+              await nftTxn.wait();
+              setPrice0(0);
+              setPrice1(0);
+              dispatch(
+                fuseActions.showMessage({
+                  message: "swap success",
+                  variant: "success",
+                })
+              );
+              await getBalance(token0, 0);
+              await getBalance(token1, 1);
+              await getTokenReserves(token0.address, token1.address);
+              await getPerPrice(token0.address, token1.address);
+
+              //  setStatus(false);
+            } catch (error) {
+              console.log("error===", error);
+              setPrice0(0);
+              setPrice1(0);
+              dispatch(
+                fuseActions.showMessage({
+                  message: error.data ? error.data.message : error.message,
+                  variant: "error",
+                })
+              );
+              //  setStatus(false);
+            }
+          }
+        }
+      }
+    } catch (error) {
+      setPrice0(0);
+      setPrice1(0);
+      dispatch(
+        fuseActions.showMessage({
+          message: error.data ? error.data.message : error.message,
+          variant: "error",
+        })
+      );
+      //  setStatus(false);
+    }
+  };
   return (
     <motion.div initial="exit" animate="enter" exit="exit">
       <motion.div variants={imageVariants}>
@@ -590,7 +804,7 @@ const Liquidity = () => {
                       columnSpacing={1}
                     >
                       <Grid item>
-                        <Typography>Balance: {balance}</Typography>
+                        <Typography>Balance: {balance1}</Typography>
                       </Grid>
                       <Grid item>
                         {token1.title !== "BNB" && (
@@ -690,6 +904,7 @@ const Liquidity = () => {
             </StyledInnerPaper>
             {allow0 && available_balance && (
               <Button
+                onClick={() => handleApprove(token0.address, 0)}
                 fullWidth
                 variant="contained"
                 sx={{
@@ -703,6 +918,7 @@ const Liquidity = () => {
             )}
             {allow1 && available_balance && (
               <Button
+                onClick={() => handleApprove(token1.address, 1)}
                 fullWidth
                 variant="contained"
                 sx={{
@@ -717,6 +933,7 @@ const Liquidity = () => {
             <Button
               disabled={allow0 || allow1 || !available_balance}
               fullWidth
+              onClick={() => handleSupply()}
               variant="contained"
               sx={{
                 background: theme.custom.gradient.grey,
