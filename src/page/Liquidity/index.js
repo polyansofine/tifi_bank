@@ -1,6 +1,7 @@
 import {
   Alert,
   Button,
+  CircularProgress,
   ClickAwayListener,
   Collapse,
   Fab,
@@ -73,6 +74,7 @@ const Liquidity = () => {
   const [allow0, setAllow0] = useState(false);
   const [allow1, setAllow1] = useState(false);
   const [available_balance, setAvailableBalance] = useState(true);
+  const [status, setStatus] = useState(false);
   const dispatch = useDispatch();
   useEffect(() => {
     const getData = async () => {
@@ -365,7 +367,7 @@ const Liquidity = () => {
   };
 
   const handleSupply = async () => {
-    //  setStatus(true);
+    setStatus(true);
     // const provider = new ethers.providers.Web3Provider(window.ethereum);
     const signer = provider.getSigner();
     let contractPrice = new ethers.Contract(
@@ -388,7 +390,7 @@ const Liquidity = () => {
               _amount = parseInt(price1).toString() + "000000000000000000";
             }
             let nftTxn = await contractPrice.addLiquidityETH(
-              token0.address,
+              token1.address,
               _amount,
               0,
               0,
@@ -414,7 +416,7 @@ const Liquidity = () => {
             await getBalance(token1, 1);
             await getTokenReserves(token0.address, token1.address);
             await getPerPrice(token0.address, token1.address);
-            //  setStatus(false);
+            setStatus(false);
             // setSwaps({ ...swaps });
           } catch (error) {
             setPrice0(0);
@@ -425,7 +427,7 @@ const Liquidity = () => {
                 variant: "error",
               })
             );
-            //  setStatus(false);
+            setStatus(false);
 
             // setSwaps({ ...swaps });
           }
@@ -446,7 +448,7 @@ const Liquidity = () => {
               let nftTxn;
 
               nftTxn = await contractPrice.addLiquidityETH(
-                token1.address,
+                token0.address,
                 _amount,
                 0,
                 0,
@@ -476,7 +478,7 @@ const Liquidity = () => {
               await getTokenReserves(token0.address, token1.address);
               await getPerPrice(token0.address, token1.address);
 
-              //  setStatus(false);
+              setStatus(false);
             } catch (error) {
               console.log("error===", error);
               setPrice0(0);
@@ -487,7 +489,7 @@ const Liquidity = () => {
                   variant: "error",
                 })
               );
-              //  setStatus(false);
+              setStatus(false);
             }
           } else {
             try {
@@ -532,7 +534,7 @@ const Liquidity = () => {
               await getTokenReserves(token0.address, token1.address);
               await getPerPrice(token0.address, token1.address);
 
-              //  setStatus(false);
+              setStatus(false);
             } catch (error) {
               console.log("error===", error);
               setPrice0(0);
@@ -543,7 +545,7 @@ const Liquidity = () => {
                   variant: "error",
                 })
               );
-              //  setStatus(false);
+              setStatus(false);
             }
           }
         }
@@ -557,7 +559,7 @@ const Liquidity = () => {
           variant: "error",
         })
       );
-      //  setStatus(false);
+      setStatus(false);
     }
   };
   return (
@@ -941,7 +943,13 @@ const Liquidity = () => {
                 my: 2,
               }}
             >
-              {!available_balance ? "Insufficent balance " : "Supply"}
+              {!available_balance ? (
+                "Insufficent balance "
+              ) : status ? (
+                <CircularProgress />
+              ) : (
+                "Supply"
+              )}
             </Button>
           </Collapse>
         </StyledPaper>
