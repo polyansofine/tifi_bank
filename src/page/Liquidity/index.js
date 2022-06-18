@@ -1,6 +1,7 @@
 import {
   Alert,
   Button,
+  ClickAwayListener,
   Collapse,
   Fab,
   Grid,
@@ -8,6 +9,7 @@ import {
   Paper,
   styled,
   TextField,
+  Tooltip,
   Typography,
   useTheme,
 } from "@mui/material";
@@ -19,7 +21,7 @@ import {
   StyleInput,
 } from "../../components/LiquidityComponents/StyledPaper";
 import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import AddIcon from "@mui/icons-material/Add";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import coin from "../../assets/image/coin.gif";
@@ -27,18 +29,14 @@ import { Box } from "@mui/system";
 import CloseIcon from "@mui/icons-material/Close";
 import TokenSearchModal from "../Swap/TokenSearchModal";
 import { motion } from "framer-motion/dist/framer-motion";
+import { CONTRACT_ADDRESS } from "../../config/contract_address";
+import getPrice from "../../config/abi/GetPrice.json";
+import { ethers } from "ethers";
+import * as fuseActions from "../../store/actions";
+import { minABI } from "../../config/TiFI_min_abi";
+import metamask from "../../assets/image/Metamask-icon.svg";
+import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 
-// const StyledPaper = styled(Paper)(({ theme, main }) => ({
-//   width: main ? 500 : "100%",
-//   padding: "10px 18px",
-//   border: main ? "#055080 1px solid" : "#343a40 1px solid",
-//   borderRadius: 10,
-//   backgroundColor: main ? "#0F0954" : "#130224",
-//   color: "white",
-//   "&:hover": {
-//     border: !main && "#130224 1px solid",
-//   },
-// }));
 let i = 0;
 const transition = {
   duration: 1,
@@ -53,15 +51,300 @@ const imageVariants = {
   },
 };
 const Liquidity = () => {
-  const { token0, token1 } = useSelector(
+  const { token0, token1, reserve0, reserve1 } = useSelector(
     ({ tokenReducers }) => tokenReducers.token
   );
-  //   const [status,setStatus] = useState(false);
+  const { address, provider } = useSelector(
+    ({ authReducers }) => authReducers.auth.auth
+  );
   const [token_index, setTokenIndex] = useState(0);
-  //   const [ttoken1, setTToken1] = useState();
   const [open, setOpen] = useState(true);
   const [openModal, setOpenModal] = useState(false);
+  const [price0, setPrice0] = useState("");
+  const [price1, setPrice1] = useState("");
   const theme = useTheme();
+  const [balance, setBalance] = useState();
+  const [balance1, setBalance1] = useState();
+  const [copy, setCopy] = useState(false);
+  const [perPrice, setPerPrice] = useState([]);
+  const [allow0_price, setAllowPrice0] = useState();
+  const [allow1_price, setAllowPrice1] = useState();
+  const [allow0, setAllow0] = useState(false);
+  const [allow1, setAllow1] = useState(false);
+  const [available_balance, setAvailableBalance] = useState(true);
+  const dispatch = useDispatch();
+  useEffect(() => {
+    const getData = async () => {
+      setPrice0(0);
+      setPrice1(0);
+      setAllow0(false);
+      setAllow1(false);
+      await getBalance(token0, 0);
+      await getBalance(token1, 1);
+      await getTokenReserves(token0.address, token1.address);
+      await getPerPrice(token0.address, token1.address);
+      await checkAllowance(token0.address, token1.address);
+    };
+    if (address && provider) {
+      getData();
+    }
+  }, [address, provider, token0, token1]);
+
+  const getTokenReserves = async (address0, address1) => {
+    if (provider) {
+      const signer = provider.getSigner();
+      let contractPrice = new ethers.Contract(
+        CONTRACT_ADDRESS.GET_PRICE_ADDRESS,
+        getPrice.abi,
+        signer
+      );
+      if (address1 && address0 && address !== null) {
+        try {
+          const PriveVal = await contractPrice.getReserves(address0, address1);
+          console.log("prive====", PriveVal[0] / 10 ** 18);
+          dispatch(
+            fuseActions.getReserves(
+              PriveVal[0] / 10 ** 18,
+              PriveVal[1] / 10 ** 18
+            )
+          );
+        } catch (error) {
+          dispatch(
+            fuseActions.showMessage({
+              message: error.data ? error.data.message : error.message,
+              variant: "error",
+            })
+          );
+        }
+      }
+    }
+  };
+
+  const handleChange = (e, index) => {
+    // if (e.target.value == "" || e.target.value == 0) {
+    //   if (index === 0) {
+    //     setPrice1("");
+    //   } else {
+    //     setPrice0("");
+    //   }
+    //   return 0;
+    // }
+    let tmpval;
+    // const rgx = /^[0-9]*(\.\d{0,9})?$/;
+    // let result = e.target.value.toString().match(rgx);
+    // console.log(
+    //   "🚀 -> file: index.js -> line 118 -> handleChange -> result",
+    //   result
+    // );
+    tmpval = e.target.value;
+
+    if (index == 0) {
+      if (tmpval > balance) {
+        setAvailableBalance(false);
+      } else {
+        setAvailableBalance(true);
+      }
+      setPrice0(tmpval);
+      setPrice1(
+        Math.round(((tmpval * reserve1) / reserve0) * 10 ** 9) / 10 ** 9
+      );
+      if (allow0_price > tmpval || token0.title == "BNB") {
+        setAllow0(false);
+      } else {
+        setAllow0(true);
+      }
+      if (
+        allow1_price > (tmpval * reserve1) / reserve0 ||
+        token1.title == "BNB"
+      ) {
+        setAllow1(false);
+      } else {
+        setAllow1(true);
+      }
+    } else {
+      if (tmpval > balance1) {
+        setAvailableBalance(false);
+      } else {
+        setAvailableBalance(true);
+      }
+      setPrice1(tmpval);
+      setPrice0(
+        Math.round(((tmpval * reserve0) / reserve1) * 10 ** 9) / 10 ** 9
+      );
+      if (allow1_price > tmpval || token1.title == "BNB") {
+        setAllow1(false);
+      } else {
+        setAllow1(true);
+      }
+      if (
+        allow0_price > (tmpval * reserve0) / reserve1 ||
+        token0.title == "BNB"
+      ) {
+        setAllow0(false);
+      } else {
+        setAllow0(true);
+      }
+    }
+  };
+
+  const getBalance = async (token, index) => {
+    // const providers = new ethers.providers.Web3Provider(window.ethereum);
+    const signer = provider.getSigner();
+    let contract = new ethers.Contract(token.address, minABI, signer);
+    console.log("contract===", contract);
+    try {
+      if (address != null) {
+        const token0Bal = await contract.balanceOf(address);
+        const token0Decimals = await contract.decimals();
+        if (token.title == "BNB") {
+          const bnbBalbuf = await provider.getBalance(address);
+          const balBNB = ethers.utils.formatUnits(bnbBalbuf, "ether");
+          if (index === 0) {
+            setBalance(Number(balBNB));
+          } else {
+            setBalance1(Number(balBNB));
+          }
+          return Number(balBNB);
+        } else {
+          if (index === 0) {
+            setBalance(Number(token0Bal._hex) / Number(10 ** token0Decimals));
+          } else {
+            setBalance1(Number(token0Bal._hex) / Number(10 ** token0Decimals));
+          }
+          return Number(token0Bal._hex) / Number(10 ** token0Decimals);
+        }
+      } else {
+        return 0;
+      }
+    } catch (error) {
+      return 0;
+    }
+  };
+  const handleAddToken = async (index) => {
+    try {
+      let decimal;
+      let contract;
+      const signer = provider.getSigner();
+      if (index === 0) {
+        contract = new ethers.Contract(token0.address, minABI, signer);
+      } else {
+        contract = new ethers.Contract(token1.address, minABI, signer);
+      }
+      decimal = await contract.decimals();
+      const wasAdded = await window.ethereum.request({
+        method: "wallet_watchAsset",
+        params: {
+          type: "ERC20", // Initially only supports ERC20, but eventually more!
+          options: {
+            address: index === 0 ? token0.address : token1.address, // The address that the token is at.
+            symbol: index === 0 ? token0.title : token1.title, // A ticker symbol or shorthand, up to 5 chars.
+            decimals: decimal, // The number of decimals in the token
+            // image: `/images/tokens/${
+            //   index === 0 ? token0.address : token1.address
+            // }.png`, // A string url of the token logo
+            // TODO: add image
+          },
+        },
+      });
+      if (wasAdded) {
+        dispatch(
+          fuseActions.showMessage({
+            message: `${
+              index == 0 ? token0.title : token1.title
+            } successful added`,
+            variant: "success",
+          })
+        );
+      } else {
+        dispatch(
+          fuseActions.showMessage({
+            message: `${index == 0 ? token0.title : token1.title} added failed`,
+            variant: "error",
+          })
+        );
+      }
+    } catch (error) {
+      dispatch(
+        fuseActions.showMessage({
+          message: error.data ? error.data.message : error.message,
+          variant: "error",
+        })
+      );
+    }
+  };
+
+  const getPerPrice = async (address0, address1) => {
+    const signer = provider.getSigner();
+    let contractPrice = new ethers.Contract(
+      CONTRACT_ADDRESS.GET_PRICE_ADDRESS,
+      getPrice.abi,
+      signer
+    );
+    const perPrice0 = await contractPrice.getTokenPriceUsingAmount(
+      address0,
+      address1,
+      (10 ** 18).toString()
+    );
+    const perPrice1 = await contractPrice.getTokenPriceUsingAmount(
+      address1,
+      address0,
+      (10 ** 18).toString()
+    );
+    console.log("price===", perPrice1 / 10 ** 18);
+    let tmpPrices = [
+      Math.round((perPrice0 / 10 ** 18) * 10 ** 9) / 10 ** 9,
+      Math.round((perPrice1 / 10 ** 18) * 10 ** 9) / 10 ** 9,
+    ];
+
+    setPerPrice(tmpPrices);
+  };
+
+  const handleCopy = async (index) => {
+    navigator.clipboard
+      .writeText(index === 0 ? token0.address : token1.address)
+      .then(
+        function () {
+          console.log("Async: Copying to clipboard was successful!");
+          setCopy(index === 0 ? 0 : 1);
+          const timer = setTimeout(() => setCopy(false), 1000);
+        },
+        function (err) {
+          console.error("Async: Could not copy text: ", err);
+          setCopy(false);
+        }
+      );
+  };
+
+  const checkAllowance = async (address0, address1) => {
+    const signer = provider.getSigner();
+    if (token0.title == "BNB") {
+      setAllow0(false);
+      setAllowPrice0(0);
+    } else {
+      let contract0 = new ethers.Contract(address0, minABI, signer);
+      const allow_price0 = await contract0.allowance(
+        address,
+        CONTRACT_ADDRESS.ROUTER_ADDRESS
+      );
+      setAllowPrice0(allow_price0 / 10 ** 18);
+    }
+    if (token1.title == "BNB") {
+      setAllow1(false);
+      setAllowPrice1(0);
+    } else {
+      let contract1 = new ethers.Contract(address1, minABI, signer);
+
+      const allow_price1 = await contract1.allowance(
+        address,
+        CONTRACT_ADDRESS.ROUTER_ADDRESS
+      );
+      setAllowPrice1(allow_price1 / 10 ** 18);
+    }
+  };
+
+  const handleTooltipClose = () => {
+    setCopy(false);
+  };
 
   return (
     <motion.div initial="exit" animate="enter" exit="exit">
@@ -136,9 +419,71 @@ const Liquidity = () => {
                 </Grid>
               </Grid>
               <Grid item md={8}>
-                <StyledPaper text>
-                  <StyleInput placeholder="0.0" />
-                </StyledPaper>
+                <Grid container direction="column" rowSpacing={1}>
+                  <Grid item>
+                    <StyledPaper text>
+                      <StyleInput
+                        type="number"
+                        placeholder="0.0"
+                        value={price0}
+                        onChange={(e) => handleChange(e, 0)}
+                      />
+                    </StyledPaper>
+                  </Grid>
+                  <Grid item>
+                    <Grid
+                      container
+                      direction="row-reverse"
+                      alignItems="center"
+                      columnSpacing={1}
+                    >
+                      <Grid item>
+                        <Typography>Balance: {balance}</Typography>
+                      </Grid>
+                      <Grid item>
+                        {token0.title !== "BNB" && (
+                          <ClickAwayListener onClickAway={handleTooltipClose}>
+                            <Tooltip
+                              open={copy === 0}
+                              title="copied"
+                              placement="top"
+                              arrow
+                              disableFocusListener
+                              disableHoverListener
+                              disableTouchListener
+                              PopperProps={{
+                                disablePortal: true,
+                              }}
+                            >
+                              <IconButton
+                                size="small"
+                                onClick={() => handleCopy(0)}
+                              >
+                                <ContentCopyIcon
+                                  fontSize="small"
+                                  color="secondary"
+                                  sx={{ color: "grey" }}
+                                />
+                              </IconButton>
+                            </Tooltip>
+                          </ClickAwayListener>
+                        )}
+                      </Grid>
+                      <Grid item>
+                        {token0.title !== "BNB" && (
+                          <IconButton onClick={() => handleAddToken(0)}>
+                            <img
+                              src={metamask}
+                              alt="metamask"
+                              width="20px"
+                              height="20px"
+                            />
+                          </IconButton>
+                        )}
+                      </Grid>
+                    </Grid>
+                  </Grid>
+                </Grid>
               </Grid>
             </Grid>
           </StyledInnerPaper>
@@ -226,9 +571,71 @@ const Liquidity = () => {
                 </Grid>
               </Grid>
               <Grid item md={8}>
-                <StyledPaper text>
-                  <StyleInput placeholder="0.0" />
-                </StyledPaper>
+                <Grid container direction="column" rowSpacing={1}>
+                  <Grid item>
+                    <StyledPaper text>
+                      <StyleInput
+                        type="number"
+                        placeholder="0.0"
+                        value={price1}
+                        onChange={(e) => handleChange(e, 1)}
+                      />
+                    </StyledPaper>
+                  </Grid>
+                  <Grid item>
+                    <Grid
+                      container
+                      direction="row-reverse"
+                      alignItems="center"
+                      columnSpacing={1}
+                    >
+                      <Grid item>
+                        <Typography>Balance: {balance}</Typography>
+                      </Grid>
+                      <Grid item>
+                        {token1.title !== "BNB" && (
+                          <ClickAwayListener onClickAway={handleTooltipClose}>
+                            <Tooltip
+                              open={copy === 1}
+                              title="copied"
+                              placement="top"
+                              arrow
+                              disableFocusListener
+                              disableHoverListener
+                              disableTouchListener
+                              PopperProps={{
+                                disablePortal: true,
+                              }}
+                            >
+                              <IconButton
+                                size="small"
+                                onClick={() => handleCopy(1)}
+                              >
+                                <ContentCopyIcon
+                                  fontSize="small"
+                                  color="secondary"
+                                  sx={{ color: "grey" }}
+                                />
+                              </IconButton>
+                            </Tooltip>
+                          </ClickAwayListener>
+                        )}
+                      </Grid>
+                      <Grid item>
+                        {token1.title !== "BNB" && (
+                          <IconButton onClick={() => handleAddToken(1)}>
+                            <img
+                              src={metamask}
+                              alt="metamask"
+                              width="20px"
+                              height="20px"
+                            />
+                          </IconButton>
+                        )}
+                      </Grid>
+                    </Grid>
+                  </Grid>
+                </Grid>
               </Grid>
             </Grid>
           </StyledInnerPaper>
@@ -240,27 +647,38 @@ const Liquidity = () => {
                   <Grid item md={4}>
                     <Grid container direction="column" alignItems="center">
                       <Grid item>
-                        <Typography>77777</Typography>
+                        <Typography>{perPrice[1]}</Typography>
                       </Grid>
                       <Grid item>
-                        <Typography>TiFi per bnb</Typography>
-                      </Grid>
-                    </Grid>
-                  </Grid>
-                  <Grid item md={4}>
-                    <Grid container direction="column" alignItems="center">
-                      <Grid item>
-                        <Typography>77777</Typography>
-                      </Grid>
-                      <Grid item>
-                        <Typography>bnb per TiFi</Typography>
+                        <Typography>
+                          {token0.title} per {token1.title}
+                        </Typography>
                       </Grid>
                     </Grid>
                   </Grid>
                   <Grid item md={4}>
                     <Grid container direction="column" alignItems="center">
                       <Grid item>
-                        <Typography>0%</Typography>
+                        <Typography>{perPrice[0]}</Typography>
+                      </Grid>
+                      <Grid item>
+                        <Typography>
+                          {token1.title} per {token0.title}
+                        </Typography>
+                      </Grid>
+                    </Grid>
+                  </Grid>
+                  <Grid item md={4}>
+                    <Grid container direction="column" alignItems="center">
+                      <Grid item>
+                        <Typography>
+                          {(price0 / reserve0) * 100 > 100
+                            ? 100
+                            : (price0 / reserve0) * 100 < 0.01
+                            ? "<<0.01"
+                            : Math.round((price0 / reserve0) * 100 * 100) / 100}
+                          %
+                        </Typography>
                       </Grid>
                       <Grid item>
                         <Typography>Share of pool</Typography>
@@ -270,7 +688,34 @@ const Liquidity = () => {
                 </Grid>
               </StyledInnerPaper>
             </StyledInnerPaper>
+            {allow0 && available_balance && (
+              <Button
+                fullWidth
+                variant="contained"
+                sx={{
+                  background: theme.custom.gradient.grey,
+                  height: "50px",
+                  my: 2,
+                }}
+              >
+                Enable {token0.title}
+              </Button>
+            )}
+            {allow1 && available_balance && (
+              <Button
+                fullWidth
+                variant="contained"
+                sx={{
+                  background: theme.custom.gradient.grey,
+                  height: "50px",
+                  my: 2,
+                }}
+              >
+                Enable {token1.title}
+              </Button>
+            )}
             <Button
+              disabled={allow0 || allow1 || !available_balance}
               fullWidth
               variant="contained"
               sx={{
@@ -279,7 +724,7 @@ const Liquidity = () => {
                 my: 2,
               }}
             >
-              Add liquidity
+              {!available_balance ? "Insufficent balance " : "Supply"}
             </Button>
           </Collapse>
         </StyledPaper>
