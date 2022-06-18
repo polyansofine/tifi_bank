@@ -9,7 +9,8 @@ import {
   useTheme,
   IconButton,
   CircularProgress,
-  Chip,
+  Tooltip,
+  ClickAwayListener,
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
@@ -25,6 +26,9 @@ import WalletConnect from "../../components/WalletConnect";
 import * as fuseActions from "../../store/actions";
 import RouterABI from "../../config/abi/TiFiRouter.json";
 import { motion } from "framer-motion/dist/framer-motion";
+import ContentCopyIcon from "@mui/icons-material/ContentCopy";
+import metamask from "../../assets/image/Metamask-icon.svg";
+import CachedIcon from "@mui/icons-material/Cached";
 
 const StyledPaper = styled(Paper)(({ theme, main }) => ({
   width: main ? 500 : "100%",
@@ -69,6 +73,9 @@ const Swap = () => {
   const [reserve_available, setReserveAvailable] = useState(false);
   const [balance_avaliable, setBalanceAvailable] = useState(false);
   const [status, setStatus] = useState(false);
+  const [copy, setCopy] = useState(false);
+  const [perPrice, setPerPrice] = useState([]);
+  const [refresh, setRefresh] = useState(false);
   const dispatch = useDispatch();
 
   const { address, provider } = useSelector(
@@ -87,6 +94,7 @@ const Swap = () => {
       await getBalance(token0, 0);
       await getBalance(token1, 1);
       await getTokenReserves(token0.address, token1.address);
+      await getPerPrice(token0.address, token1.address);
     };
     if (address && provider) {
       getData();
@@ -151,14 +159,43 @@ const Swap = () => {
       }
     }
   };
+  const getPerPrice = async (address0, address1) => {
+    const signer = provider.getSigner();
+    let contractPrice = new ethers.Contract(
+      CONTRACT_ADDRESS.GET_PRICE_ADDRESS,
+      getPrice.abi,
+      signer
+    );
+    const perPrice0 = await contractPrice.getTokenPriceUsingAmount(
+      address0,
+      address1,
+      (10 ** 18).toString()
+    );
+    const perPrice1 = await contractPrice.getTokenPriceUsingAmount(
+      address1,
+      address0,
+      (10 ** 18).toString()
+    );
+    console.log("price===", perPrice1 / 10 ** 18);
+    let tmpPrices = [perPrice0 / 10 ** 18, perPrice1 / 10 ** 18];
+
+    setPerPrice(tmpPrices);
+  };
 
   const handleChange = (e, index) => {
+    if (e.target.value == "") {
+      if (index === 0) {
+        setPrice1("");
+      } else {
+        setPrice0("");
+      }
+    }
     let tmpVlue2;
     const rgx = /^[0-9]*(\.\d{0,9})?$/;
     let result = e.target.value.toString().match(rgx);
     tmpVlue2 = result[0];
     console.log("value==", tmpVlue2);
-    
+
     if (tmpVlue2[0] == "0") {
       if (tmpVlue2.length < 2) {
       } else {
@@ -547,6 +584,79 @@ const Swap = () => {
     }
   };
 
+  const handleCopy = async (index) => {
+    navigator.clipboard
+      .writeText(index === 0 ? token0.address : token1.address)
+      .then(
+        function () {
+          console.log("Async: Copying to clipboard was successful!");
+          setCopy(index === 0 ? 0 : 1);
+          const timer = setTimeout(() => setCopy(false), 1000);
+        },
+        function (err) {
+          console.error("Async: Could not copy text: ", err);
+          setCopy(false);
+        }
+      );
+  };
+
+  const handleTooltipClose = () => {
+    setCopy(false);
+  };
+
+  const handleAddToken = async (index) => {
+    try {
+      let decimal;
+      let contract;
+      const signer = provider.getSigner();
+      if (index === 0) {
+        contract = new ethers.Contract(token0.address, minABI, signer);
+      } else {
+        contract = new ethers.Contract(token1.address, minABI, signer);
+      }
+      decimal = await contract.decimals();
+      const wasAdded = await window.ethereum.request({
+        method: "wallet_watchAsset",
+        params: {
+          type: "ERC20", // Initially only supports ERC20, but eventually more!
+          options: {
+            address: index === 0 ? token0.address : token1.address, // The address that the token is at.
+            symbol: index === 0 ? token0.title : token1.title, // A ticker symbol or shorthand, up to 5 chars.
+            decimals: decimal, // The number of decimals in the token
+            // image: `/images/tokens/${
+            //   index === 0 ? token0.address : token1.address
+            // }.png`, // A string url of the token logo
+            // TODO: add image
+          },
+        },
+      });
+      if (wasAdded) {
+        dispatch(
+          fuseActions.showMessage({
+            message: `${
+              index == 0 ? token0.title : token1.title
+            } successful added`,
+            variant: "success",
+          })
+        );
+      } else {
+        dispatch(
+          fuseActions.showMessage({
+            message: `${index == 0 ? token0.title : token1.title} added failed`,
+            variant: "error",
+          })
+        );
+      }
+    } catch (error) {
+      dispatch(
+        fuseActions.showMessage({
+          message: error.data ? error.data.message : error.message,
+          variant: "error",
+        })
+      );
+    }
+  };
+
   const CoinButton = React.forwardRef(({ src, children, ...rest }, ref) => {
     return (
       <Button
@@ -595,16 +705,61 @@ const Swap = () => {
             Swap
           </Typography>
           <StyledPaper>
-            <Grid container direction="row-reverse">
-              <CoinButton
-                onClick={() => {
-                  setOpen(true);
-                  setTokenIndex(0);
-                }}
-                src={`/images/tokens/${token0.address}.png`}
-              >
-                {token0.title}
-              </CoinButton>
+            <Grid
+              container
+              direction="row-reverse"
+              alignItems="center"
+              columnSpacing={1}
+            >
+              <Grid item>
+                <CoinButton
+                  onClick={() => {
+                    setOpen(true);
+                    setTokenIndex(0);
+                  }}
+                  src={`/images/tokens/${token0.address}.png`}
+                >
+                  {token0.title}
+                </CoinButton>
+              </Grid>
+              <Grid item>
+                {token0.title !== "BNB" && (
+                  <ClickAwayListener onClickAway={handleTooltipClose}>
+                    <Tooltip
+                      open={copy === 0}
+                      title="copied"
+                      placement="top"
+                      arrow
+                      disableFocusListener
+                      disableHoverListener
+                      disableTouchListener
+                      PopperProps={{
+                        disablePortal: true,
+                      }}
+                    >
+                      <IconButton size="small" onClick={() => handleCopy(0)}>
+                        <ContentCopyIcon
+                          fontSize="small"
+                          color="secondary"
+                          sx={{ color: "grey" }}
+                        />
+                      </IconButton>
+                    </Tooltip>
+                  </ClickAwayListener>
+                )}
+              </Grid>
+              <Grid item>
+                {token0.title !== "BNB" && (
+                  <IconButton onClick={() => handleAddToken(0)}>
+                    <img
+                      src={metamask}
+                      alt="metamask"
+                      width="20px"
+                      height="20px"
+                    />
+                  </IconButton>
+                )}
+              </Grid>
             </Grid>
             <Grid container direction="column">
               <Grid item>
@@ -663,16 +818,61 @@ const Swap = () => {
             </Fab>
           </Grid>
           <StyledPaper sx={{ mt: 1 }}>
-            <Grid container direction="row-reverse">
-              <CoinButton
-                onClick={() => {
-                  setOpen(true);
-                  setTokenIndex(1);
-                }}
-                src={`/images/tokens/${token1.address}.png`}
-              >
-                {token1.title}
-              </CoinButton>
+            <Grid
+              container
+              direction="row-reverse"
+              alignItems="center"
+              columnSpacing={1}
+            >
+              <Grid item>
+                <CoinButton
+                  onClick={() => {
+                    setOpen(true);
+                    setTokenIndex(1);
+                  }}
+                  src={`/images/tokens/${token1.address}.png`}
+                >
+                  {token1.title}
+                </CoinButton>
+              </Grid>
+              <Grid item>
+                {token1.title !== "BNB" && (
+                  <ClickAwayListener onClickAway={handleTooltipClose}>
+                    <Tooltip
+                      open={copy === 1}
+                      title="copied"
+                      placement="top"
+                      arrow
+                      disableFocusListener
+                      disableHoverListener
+                      disableTouchListener
+                      PopperProps={{
+                        disablePortal: true,
+                      }}
+                    >
+                      <IconButton onClick={() => handleCopy(1)} size="small">
+                        <ContentCopyIcon
+                          fontSize="small"
+                          color="secondary"
+                          sx={{ color: "grey" }}
+                        />
+                      </IconButton>
+                    </Tooltip>
+                  </ClickAwayListener>
+                )}
+              </Grid>
+              <Grid item>
+                {token1.title !== "BNB" && (
+                  <IconButton onClick={() => handleAddToken(1)}>
+                    <img
+                      src={metamask}
+                      alt="metamask"
+                      width="20px"
+                      height="20px"
+                    />
+                  </IconButton>
+                )}
+              </Grid>
             </Grid>
             <Grid container direction="column">
               <Grid item>
@@ -718,6 +918,29 @@ const Swap = () => {
               </Grid>
             </Grid>
           </StyledPaper>
+          {price0 !== 0 && price0 !== "" && price1 !== 0 && price1 !== "" && (
+            <Grid container justifyContent="space-between" alignItems="center">
+              <Grid item>
+                <Typography>Price</Typography>
+              </Grid>
+              <Grid item>
+                <Grid container direction="row-reserve" alignItems="center">
+                  <Grid item>
+                    <Typography>
+                      {perPrice[refresh ? 0 : 1]}
+                      {refresh ? token1.title : token0.title} per{" "}
+                      {refresh ? token0.title : token1.title}
+                    </Typography>
+                  </Grid>
+                  <Grid item>
+                    <IconButton onClick={() => setRefresh((prev) => !prev)}>
+                      <CachedIcon color="secondary" />
+                    </IconButton>
+                  </Grid>
+                </Grid>
+              </Grid>
+            </Grid>
+          )}
           {address ? (
             !price0 ? (
               <Button
