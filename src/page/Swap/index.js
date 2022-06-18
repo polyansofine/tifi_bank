@@ -11,6 +11,7 @@ import {
   CircularProgress,
   Tooltip,
   ClickAwayListener,
+  Collapse,
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
@@ -177,13 +178,16 @@ const Swap = () => {
       (10 ** 18).toString()
     );
     console.log("price===", perPrice1 / 10 ** 18);
-    let tmpPrices = [perPrice0 / 10 ** 18, perPrice1 / 10 ** 18];
+    let tmpPrices = [
+      Math.round((perPrice0 / 10 ** 18) * 10 ** 9) / 10 ** 9,
+      Math.round((perPrice1 / 10 ** 18) * 10 ** 9) / 10 ** 9,
+    ];
 
     setPerPrice(tmpPrices);
   };
 
   const handleChange = (e, index) => {
-    if (e.target.value == "") {
+    if (e.target.value == "" || e.target.value == 0) {
       if (index === 0) {
         setPrice1("");
       } else {
@@ -194,7 +198,7 @@ const Swap = () => {
     const rgx = /^[0-9]*(\.\d{0,9})?$/;
     let result = e.target.value.toString().match(rgx);
     tmpVlue2 = result[0];
-    console.log("value==", tmpVlue2);
+    // console.log("value==", tmpVlue2);
 
     if (tmpVlue2[0] == "0") {
       if (tmpVlue2.length < 2) {
@@ -414,6 +418,7 @@ const Swap = () => {
             await getBalance(token0, 0);
             await getBalance(token1, 1);
             await getTokenReserves(token0.address, token1.address);
+            await getPerPrice(token0.address, token1.address);
             setStatus(false);
             // setSwaps({ ...swaps });
           } catch (error) {
@@ -486,6 +491,8 @@ const Swap = () => {
               await getBalance(token0, 0);
               await getBalance(token1, 1);
               await getTokenReserves(token0.address, token1.address);
+              await getPerPrice(token0.address, token1.address);
+
               setStatus(false);
             } catch (error) {
               console.log("error===", error);
@@ -555,6 +562,8 @@ const Swap = () => {
               await getBalance(token0, 0);
               await getBalance(token1, 1);
               await getTokenReserves(token0.address, token1.address);
+              await getPerPrice(token0.address, token1.address);
+
               setStatus(false);
             } catch (error) {
               console.log("error===", error);
@@ -918,15 +927,18 @@ const Swap = () => {
               </Grid>
             </Grid>
           </StyledPaper>
-          {price0 !== 0 && price0 !== "" && price1 !== 0 && price1 !== "" && (
+          {/* {price0 !== 0 && price0 !== "" && price1 !== 0 && price1 !== "" && ( */}
+          <Collapse
+            in={price0 !== 0 && price0 !== "" && price1 !== 0 && price1 !== ""}
+          >
             <Grid container justifyContent="space-between" alignItems="center">
               <Grid item>
-                <Typography>Price</Typography>
+                <Typography sx={{ color: "#8a817c" }}>Price</Typography>
               </Grid>
               <Grid item>
                 <Grid container direction="row-reserve" alignItems="center">
                   <Grid item>
-                    <Typography>
+                    <Typography sx={{ color: "#8a817c" }}>
                       {perPrice[refresh ? 0 : 1]}
                       {refresh ? token1.title : token0.title} per{" "}
                       {refresh ? token0.title : token1.title}
@@ -934,13 +946,17 @@ const Swap = () => {
                   </Grid>
                   <Grid item>
                     <IconButton onClick={() => setRefresh((prev) => !prev)}>
-                      <CachedIcon color="secondary" />
+                      <CachedIcon
+                        // color="secondary"
+                        sx={{ color: "#8a817c" }}
+                      />
                     </IconButton>
                   </Grid>
                 </Grid>
               </Grid>
             </Grid>
-          )}
+          </Collapse>
+          {/* )} */}
           {address ? (
             !price0 ? (
               <Button
