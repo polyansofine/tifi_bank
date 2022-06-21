@@ -9,7 +9,10 @@ import Swap from "./page/Swap";
 import { Provider } from "react-redux";
 import store from "./store/store";
 import FuseMessage from "./components/FuseMessage/FuseMessage";
+// import Liquidity from "./page/Liquidity";
+import LiquidityPage from "./page/Liquidity/LiquidityPage";
 import Liquidity from "./page/Liquidity";
+import LiquidityRouter from "./page/Liquidity/LiquidityRouter";
 
 function App() {
   return (
@@ -21,7 +24,8 @@ function App() {
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/swap" element={<Swap />} />
-              <Route path="/liquidity" element={<Liquidity />} />
+              <Route path="/liquidity/*" element={<LiquidityRouter />} />
+
               {/* <Route path="/" element={<Home />} />
             <Route path="/" element={<Home />} />
             <Route path="/" element={<Home />} /> */}

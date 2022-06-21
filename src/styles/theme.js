@@ -72,6 +72,7 @@ export const theme = createTheme({
       pink: `linear-gradient(90deg, rgba(198,20,203,1) 32%, rgba(143,13,94,1) 88%)`,
       grey: `linear-gradient(90deg, #969797 0%, #1E2848 100%)`,
       green: `linear-gradient(90deg, #32CE27 0%, #2A4428 100%)`,
+      blue: `linear-gradient(90deg, #1FC7D3 0%, #0A4428 100%)`,
     },
   },
 });
