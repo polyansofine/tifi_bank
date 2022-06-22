@@ -53,8 +53,11 @@ const imageVariants = {
   },
 };
 const Liquidity = () => {
-  const { token0, token1, reserve0, reserve1 } = useSelector(
+  const { reserve0, reserve1 } = useSelector(
     ({ tokenReducers }) => tokenReducers.token
+  );
+  const { token0, token1 } = useSelector(
+    ({ tokenReducers }) => tokenReducers.liquidity
   );
   const { address, provider } = useSelector(
     ({ authReducers }) => authReducers.auth.auth
@@ -610,27 +613,52 @@ const Liquidity = () => {
           <StyledInnerPaper>
             <Grid container columnSpacing={4}>
               <Grid item md={4}>
-                <Grid container alignItems="center" columnSpacing={2}>
+                <Grid container alignItems="center" columnSpacing={1}>
                   <Grid item>
-                    <img
-                      src={`/images/tokens/${token0.address}.png`}
-                      alt={token0.title}
-                      width="50px"
-                    />
+                    {token0.title ? (
+                      <img
+                        src={`/images/tokens/${token0.address}.png`}
+                        alt={token0.title}
+                        width="50px"
+                      />
+                    ) : (
+                      <Box
+                        sx={{
+                          background: "#2E3348",
+                          borderRadius: "8px",
+                          p: 1,
+                        }}
+                      >
+                        <img src={coin} alt={token1?.title} width="40px" />
+                      </Box>
+                    )}
                   </Grid>
                   <Grid item>
                     <Typography sx={{ ml: 2, fontSize: "14px" }}>
                       Input
                     </Typography>
-                    <Button
-                      onClick={() => {
-                        setOpenModal(true);
-                        setTokenIndex(0);
-                      }}
-                      endIcon={<KeyboardArrowDownIcon />}
-                    >
-                      {token0.title}
-                    </Button>
+                    {token0.title ? (
+                      <Button
+                        onClick={() => {
+                          setOpenModal(true);
+                          setTokenIndex(0);
+                        }}
+                        endIcon={<KeyboardArrowDownIcon />}
+                      >
+                        {token0.title}
+                      </Button>
+                    ) : (
+                      <Button
+                        onClick={() => {
+                          setOpenModal(true);
+                          setTokenIndex(0);
+                        }}
+                        variant="outlined"
+                        size="small"
+                      >
+                        Select a token
+                      </Button>
+                    )}
                   </Grid>
                 </Grid>
               </Grid>
@@ -739,7 +767,7 @@ const Liquidity = () => {
               <Grid item md={4}>
                 <Grid container alignItems="center" columnSpacing={1}>
                   <Grid item>
-                    {token1 ? (
+                    {token1.title ? (
                       <img
                         src={`/images/tokens/${token1.address}.png`}
                         alt={token1.title}
@@ -761,7 +789,7 @@ const Liquidity = () => {
                     <Typography sx={{ ml: 2, fontSize: "14px" }}>
                       Input
                     </Typography>
-                    {token1 ? (
+                    {token1.title ? (
                       <Button
                         onClick={() => {
                           setOpenModal(true);
@@ -855,7 +883,7 @@ const Liquidity = () => {
               </Grid>
             </Grid>
           </StyledInnerPaper>
-          <Collapse in={open} sx={{ mt: 3 }}>
+          <Collapse in={token0.title && token1.title} sx={{ mt: 3 }}>
             <StyledInnerPaper>
               <Typography sx={{ mb: 2 }}>Price and pool share</Typography>
               <StyledInnerPaper text>

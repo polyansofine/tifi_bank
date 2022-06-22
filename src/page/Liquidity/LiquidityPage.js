@@ -7,6 +7,8 @@ import { ethers } from "ethers";
 import { LP_TOKENS } from "../../config/LP_tokens";
 import { minABI } from "../../config/TiFI_min_abi";
 import * as liquidityActions from "../../store/actions";
+import { TOKENS } from "../../config/token";
+import _ from "lodash";
 
 const LiquidityPage = () => {
   const { address, provider } = useSelector(
@@ -45,6 +47,15 @@ const LiquidityPage = () => {
                 balance: temp_val,
                 token0Title: item.token0_name,
                 token1Title: item.token1_name,
+                address: item.address,
+                token0Address:
+                  TOKENS[
+                    _.findIndex(TOKENS, (o) => o.title == item.token0_name)
+                  ].address,
+                token1Address:
+                  TOKENS[
+                    _.findIndex(TOKENS, (o) => o.title == item.token1_name)
+                  ].address,
               });
             }
           })

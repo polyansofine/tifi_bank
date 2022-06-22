@@ -10,18 +10,54 @@ import { useDispatch, useSelector } from "react-redux";
 import _ from "lodash";
 import { TOKENS } from "../../../../config/token";
 import * as liquidityActions from "../../../../store/actions";
+import { useNavigate } from "react-router-dom";
+import { ethers } from "ethers";
+import { minABI } from "../../../../config/TiFI_min_abi";
 
 export default function YourPool({ loading }) {
   const { balances } = useSelector(
     ({ tokenReducers }) => tokenReducers.liquidity
   );
-  const theme = useTheme();
+  const { address, provider } = useSelector(
+    ({ authReducers }) => authReducers.auth.auth
+  );
   const dispatch = useDispatch();
+  const theme = useTheme();
+  const navigate = useNavigate();
+  const [expanded, setExpanded] = React.useState(false);
+
+  // const handleChange = (panel) => (event, isExpanded) => {
+  // };
+  const [pool0, setPool0] = React.useState();
+  const [pool1, setPool1] = React.useState();
+  const [total, setTotal] = React.useState();
+  const handleClick = async (index, pair) => {
+    setExpanded(index);
+
+    const signer = provider.getSigner();
+    let contract = new ethers.Contract(pair.address, minABI, signer);
+
+    let totalLp = await contract.totalSupply();
+    setTotal(totalLp / 10 ** 18);
+    console.log("total=", totalLp / 10 ** 18);
+    let contaract0 = new ethers.Contract(pair.token0Address, minABI, signer);
+    let contaract1 = new ethers.Contract(pair.token1Address, minABI, signer);
+    let pooledToken0 = await contaract0.balanceOf(pair.address);
+    let pooledToken1 = await contaract1.balanceOf(pair.address);
+    setPool0(pooledToken0 / 10 ** 18);
+    setPool1(pooledToken1 / 10 ** 18);
+    console.log("pooled==", pooledToken0 / 10 ** 18, pooledToken1 / 10 ** 18);
+  };
   return (
     <div>
       {balances.length > 0 ? (
         balances.map((item, index) => (
-          <Accordion sx={{ borderRadius: 16 }} key={index}>
+          <Accordion
+            sx={{ borderRadius: 16 }}
+            key={index}
+            expanded={expanded === index}
+            onClick={() => handleClick(index, item)}
+          >
             <AccordionSummary
               expandIcon={<ExpandMoreIcon sx={{ color: "#ffffff" }} />}
               aria-controls="panel1a-content"
@@ -94,7 +130,7 @@ export default function YourPool({ loading }) {
                   </Grid>
                 </Grid>
                 <Grid item>
-                  <Typography>0.482374</Typography>
+                  <Typography>{pool0}</Typography>
                 </Grid>
               </Grid>
               <Grid
@@ -122,7 +158,7 @@ export default function YourPool({ loading }) {
                   </Grid>
                 </Grid>
                 <Grid item>
-                  <Typography>0.482374</Typography>
+                  <Typography>{pool1}</Typography>
                 </Grid>
               </Grid>
               <Grid
@@ -136,6 +172,7 @@ export default function YourPool({ loading }) {
               </Grid>
               <Grid container justifyContent="center">
                 <Button
+                  disabled={!pool0 || !pool1}
                   fullWidth
                   variant="contained"
                   sx={{
@@ -145,6 +182,10 @@ export default function YourPool({ loading }) {
                     borderRadius: 6,
                   }}
                   onClick={() => {
+                    item.pool0 = pool0;
+                    item.pool1 = pool1;
+                    item.total = total;
+
                     dispatch(liquidityActions.setRemove(item));
                   }}
                 >
@@ -191,6 +232,10 @@ export default function YourPool({ loading }) {
                   background: "#161522",
                   color: "#000000",
                 },
+              }}
+              onClick={() => {
+                dispatch(liquidityActions.setTokens(TOKENS[0], {}));
+                navigate("add");
               }}
             >
               Find other LP tokens

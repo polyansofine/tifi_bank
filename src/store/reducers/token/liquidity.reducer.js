@@ -4,6 +4,8 @@ import * as tokenActions from "../../actions";
 const initialState = {
   balances: [],
   remove: {},
+  token0: {},
+  token1: {},
 };
 const liquidity = (state = initialState, action) => {
   switch (action.type) {
@@ -17,6 +19,17 @@ const liquidity = (state = initialState, action) => {
       return {
         ...state,
         remove: action.payload,
+      };
+    }
+    case tokenActions.SET_TOKENS: {
+      return {
+        ...state,
+        token0: action.payload.token0.title
+          ? action.payload.token0
+          : state.token0,
+        token1: action.payload.token1.title
+          ? action.payload.token1
+          : state.token1,
       };
     }
 

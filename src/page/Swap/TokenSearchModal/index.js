@@ -89,8 +89,10 @@ const TokenSearchModal = ({ open, handleClose, token_index }) => {
                 handleClose();
                 if (token_index == 1) {
                   dispatch(tokenActions.selectToken(null, item));
+                  dispatch(tokenActions.setTokens({}, item));
                 } else {
                   dispatch(tokenActions.selectToken(item, null));
+                  dispatch(tokenActions.setTokens(item, {}));
                 }
               }}
             >
