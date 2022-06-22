@@ -38,6 +38,8 @@ import { minABI } from "../../config/TiFI_min_abi";
 import metamask from "../../assets/image/Metamask-icon.svg";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import RouterABI from "../../config/abi/TiFiRouter.json";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import { useNavigate } from "react-router-dom";
 
 let i = 0;
 const transition = {
@@ -79,6 +81,8 @@ const Liquidity = () => {
   const [available_balance, setAvailableBalance] = useState(true);
   const [status, setStatus] = useState(false);
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+
   useEffect(() => {
     const getData = async () => {
       setPrice0(0);
@@ -604,7 +608,17 @@ const Liquidity = () => {
             alignItems="center"
             sx={{ my: 3 }}
           >
-            <StyledBtn>Liquidity</StyledBtn>
+            <Grid item>
+              <IconButton
+                onClick={() => {
+                  dispatch(fuseActions.setTokens({}, {}));
+                  navigate("../../liquidity", { replace: true });
+                }}
+              >
+                <ArrowBackIcon color="secondary" />
+              </IconButton>{" "}
+              <StyledBtn>Liquidity</StyledBtn>
+            </Grid>
             <IconButton>
               {" "}
               <SettingsOutlinedIcon sx={{ color: "#c8b6ff" }} />
