@@ -31,22 +31,20 @@ export default function YourPool({ loading }) {
   const [pool0, setPool0] = React.useState();
   const [pool1, setPool1] = React.useState();
   const [total, setTotal] = React.useState();
-  const handleClick = async (index, pair) => {
-    setExpanded(index);
+  const handleClick = (pair) => async (event, isExpanded) => {
+    setExpanded(isExpanded ? pair.address : false);
 
     const signer = provider.getSigner();
     let contract = new ethers.Contract(pair.address, minABI, signer);
 
     let totalLp = await contract.totalSupply();
     setTotal(totalLp / 10 ** 18);
-    console.log("total=", totalLp / 10 ** 18);
     let contaract0 = new ethers.Contract(pair.token0Address, minABI, signer);
     let contaract1 = new ethers.Contract(pair.token1Address, minABI, signer);
     let pooledToken0 = await contaract0.balanceOf(pair.address);
     let pooledToken1 = await contaract1.balanceOf(pair.address);
     setPool0(pooledToken0 / 10 ** 18);
     setPool1(pooledToken1 / 10 ** 18);
-    console.log("pooled==", pooledToken0 / 10 ** 18, pooledToken1 / 10 ** 18);
   };
   return (
     <div>
@@ -55,8 +53,8 @@ export default function YourPool({ loading }) {
           <Accordion
             sx={{ borderRadius: 16 }}
             key={index}
-            expanded={expanded === index}
-            onClick={() => handleClick(index, item)}
+            expanded={expanded === item.address}
+            onChange={handleClick(item)}
           >
             <AccordionSummary
               expandIcon={<ExpandMoreIcon sx={{ color: "#ffffff" }} />}

@@ -24,8 +24,12 @@ const liquidity = (state = initialState, action) => {
     case tokenActions.SET_TOKENS: {
       return {
         ...state,
-        token0: action.payload.token0.title ? action.payload.token0 : {},
-        token1: action.payload.token1.title ? action.payload.token1 : {},
+        token0: action.payload.token0.title
+          ? action.payload.token0
+          : state.token0,
+        token1: action.payload.token1.title
+          ? action.payload.token1
+          : state.token1,
       };
     }
 

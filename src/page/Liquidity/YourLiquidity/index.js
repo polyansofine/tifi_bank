@@ -21,6 +21,7 @@ import YourPool from "./YourPool";
 import RemovePad from "./RemovePad";
 import { useNavigate } from "react-router-dom";
 import * as liquidityActions from "../../../store/actions";
+import { TOKENS } from "../../../config/token";
 
 const transition = {
   duration: 1,
@@ -37,6 +38,9 @@ const imageVariants = {
 const YourLiquidity = ({ loading }) => {
   const { address, provider } = useSelector(
     ({ authReducers }) => authReducers.auth.auth
+  );
+  const { balances } = useSelector(
+    ({ tokenReducers }) => tokenReducers.liquidity
   );
   const navigate = useNavigate();
   const theme = useTheme();
@@ -116,6 +120,26 @@ const YourLiquidity = ({ loading }) => {
             )}
           </StyledInnerPaper>
           <Grid container justifyContent="center">
+            <Fab
+              variant="extended"
+              sx={{
+                backgroundColor: "#202231",
+                color: "#1FC7D3",
+                mt: 2,
+                textTransform: "capitalize",
+                border: "1px solid #1FC7D3",
+                "&:hover": {
+                  background: "#161522",
+                  color: "#000000",
+                },
+              }}
+              onClick={() => {
+                dispatch(liquidityActions.setTokens(TOKENS[0], {}));
+                navigate("find");
+              }}
+            >
+              Import Token
+            </Fab>
             <Button
               startIcon={<AddIcon />}
               fullWidth
