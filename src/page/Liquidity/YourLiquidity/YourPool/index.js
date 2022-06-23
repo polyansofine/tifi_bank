@@ -254,7 +254,7 @@ export default function YourPool({ loading }) {
               }}
               onClick={() => {
                 dispatch(liquidityActions.setTokens(TOKENS[0], {}));
-                navigate("add");
+                navigate("find");
               }}
             >
               Find other LP tokens

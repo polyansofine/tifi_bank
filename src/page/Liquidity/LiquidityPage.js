@@ -22,6 +22,7 @@ const LiquidityPage = () => {
 
   useEffect(() => {
     const getData = async () => {
+      // dispatch(liquidityActions.setTokens({}, {}));
       await getBalance();
     };
     if (address && provider) {

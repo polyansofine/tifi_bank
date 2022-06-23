@@ -12,7 +12,11 @@ export const providerOptions = {
   walletconnect: {
     package: WalletConnect, // required
     options: {
-      infuraId: "https://mainnet.infura.io/v3/bcfab432f87b486c8bf2f547bd1981e5", // required
+      rpc: {
+        97: "https://data-seed-prebsc-1-s3.binance.org:8545/",
+      },
+
+      // infuraId: "https://mainnet.infura.io/v3/bcfab432f87b486c8bf2f547bd1981e5", // required
     },
   },
 };
