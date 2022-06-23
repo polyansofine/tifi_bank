@@ -15,11 +15,12 @@ import {
 } from "../../../components/LiquidityComponents/StyledPaper";
 import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
 import RestoreIcon from "@mui/icons-material/Restore";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import AddIcon from "@mui/icons-material/Add";
 import YourPool from "./YourPool";
 import RemovePad from "./RemovePad";
 import { useNavigate } from "react-router-dom";
+import * as liquidityActions from "../../../store/actions";
 
 const transition = {
   duration: 1,
@@ -39,6 +40,7 @@ const YourLiquidity = ({ loading }) => {
   );
   const navigate = useNavigate();
   const theme = useTheme();
+  const dispatch = useDispatch();
   return (
     <motion.div initial="exit" animate="enter" exit="exit">
       <motion.div variants={imageVariants}>
@@ -124,7 +126,10 @@ const YourLiquidity = ({ loading }) => {
                 mt: 3,
                 borderRadius: 6,
               }}
-              onClick={() => navigate("add", { replace: true })}
+              onClick={() => {
+                dispatch(liquidityActions.setTokens({}, {}));
+                navigate("add", { replace: true });
+              }}
             >
               Add Liquidity
             </Button>

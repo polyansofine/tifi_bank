@@ -201,6 +201,25 @@ export default function YourPool({ loading }) {
                     mt: 3,
                     color: "#1FC7D3",
                   }}
+                  onClick={() => {
+                    dispatch(
+                      liquidityActions.setTokens(
+                        TOKENS[
+                          _.findIndex(
+                            TOKENS,
+                            (o) => o.title === item.token0Title
+                          )
+                        ],
+                        TOKENS[
+                          _.findIndex(
+                            TOKENS,
+                            (o) => o.title === item.token1Title
+                          )
+                        ]
+                      )
+                    );
+                    navigate("add");
+                  }}
                 >
                   Add liquidity instead
                 </Button>
