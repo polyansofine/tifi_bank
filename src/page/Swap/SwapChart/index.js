@@ -193,7 +193,9 @@ function SwapChart() {
   useEffect(() => {
     if (prices) {
       // const temp = assetChart[`${index}`];
-      const tempSeries = [{ name: "TiFi", data: prices }];
+      const tempSeries = [
+        { name: "TiFi", data: index === "prices" ? prices : market_caps },
+      ];
       setSeries(tempSeries);
     }
   }, [index, prices]);
