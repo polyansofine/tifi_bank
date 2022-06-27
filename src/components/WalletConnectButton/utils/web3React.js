@@ -3,6 +3,7 @@ import { WalletConnectConnector } from "@web3-react/walletconnect-connector";
 import { BscConnector } from "@binance-chain/bsc-connector";
 import { ConnectorNames } from "@pancakeswap/uikit";
 import { ChainId } from "@pancakeswap/sdk";
+import { Web3Provider } from "@ethersproject/providers";
 
 import getNodeUrl from "./getRpcUrl";
 import { ethers } from "ethers";
@@ -42,7 +43,7 @@ export const connectorsByName = {
   },
 };
 export const getLibrary = (provider) => {
-  const library = new ethers.providers.Web3Provider(provider);
+  const library = new Web3Provider(provider);
   library.pollingInterval = POLLING_INTERVAL;
   return library;
 };
