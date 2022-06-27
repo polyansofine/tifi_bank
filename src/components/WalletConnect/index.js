@@ -132,11 +132,11 @@ const WalletConnect = ({ type }) => {
     refreshState();
   };
 
-  useEffect(() => {
-    if (web3Modal.cachedProvider) {
-      connectWallet();
-    }
-  }, []);
+  // useEffect(() => {
+  //   if (web3Modal.cachedProvider) {
+  //     connectWallet();
+  //   }
+  // }, []);
 
   useEffect(() => {
     if (provider?.on) {

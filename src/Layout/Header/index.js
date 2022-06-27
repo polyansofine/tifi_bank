@@ -12,7 +12,10 @@ import Button from "@mui/material/Button";
 import logo from "../../assets/image/TiFi.png";
 import { useTheme } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import WalletConnect from "../../components/WalletConnect";
+import WalletConnectButton from "../../components/WalletConnectButton";
+import useTranslation from "../../context/Localization/useTranslation";
+import { useWeb3React } from "@web3-react/core";
+import useAuth from "../../components/WalletConnectButton/utils/useAuth";
 
 // const pages = ["home", "liquidity", "swap", "stake", "lend", "poolInfo"];
 const pages = [
@@ -46,6 +49,9 @@ const settings = ["Home", "Account", "Dashboard", "Logout"];
 const Header = () => {
   const theme = useTheme();
   const navigate = useNavigate();
+  const { t } = useTranslation();
+  const { account } = useWeb3React();
+  const { logout } = useAuth();
   //   const [anchorElNav, setAnchorElNav] = React.useState(null);
   //   const [anchorElUser, setAnchorElUser] = React.useState(null);
 
@@ -93,13 +99,23 @@ const Header = () => {
           </Box>
 
           <Box sx={{ flexGrow: 0 }}>
+            {account ? (
+              <Button
+                variant="contained"
+                sx={{ background: theme.custom.gradient.pink }}
+                onClick={logout}
+              >
+                disconnect
+              </Button>
+            ) : (
+              <WalletConnectButton />
+            )}
             {/* <Button
               variant="contained"
               sx={{ background: theme.custom.gradient.pink }}
             >
               Connect Wallet
             </Button> */}
-            <WalletConnect />
           </Box>
         </Toolbar>
       </Container>
