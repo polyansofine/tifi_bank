@@ -9,7 +9,7 @@ import getNodeUrl from "./getRpcUrl";
 import { ethers } from "ethers";
 const POLLING_INTERVAL = 12000;
 const rpcUrl = getNodeUrl();
-const chainId = parseInt("97", 10);
+const chainId = parseInt("56", 10);
 
 const injected = new InjectedConnector({ supportedChainIds: [chainId] });
 
