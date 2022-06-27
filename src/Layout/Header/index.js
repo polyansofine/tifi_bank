@@ -16,7 +16,8 @@ import WalletConnectButton from "../../components/WalletConnectButton";
 import useTranslation from "../../context/Localization/useTranslation";
 import { useWeb3React } from "@web3-react/core";
 import useAuth from "../../components/WalletConnectButton/utils/useAuth";
-
+import { useDispatch } from "react-redux";
+import * as tokenActions from "../../store/actions";
 // const pages = ["home", "liquidity", "swap", "stake", "lend", "poolInfo"];
 const pages = [
   {
@@ -50,7 +51,13 @@ const Header = () => {
   const theme = useTheme();
   const navigate = useNavigate();
   const { t } = useTranslation();
-  const { account } = useWeb3React();
+  const { account, library } = useWeb3React();
+  const dispatch = useDispatch();
+  React.useEffect(() => {
+    if (account && library) {
+      dispatch(tokenActions.login(account, library));
+    }
+  }, [account, library]);
   console.log("tt==", account);
   const { logout } = useAuth();
   //   const [anchorElNav, setAnchorElNav] = React.useState(null);
