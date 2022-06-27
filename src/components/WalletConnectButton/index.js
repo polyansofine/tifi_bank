@@ -25,12 +25,7 @@ const WalletConnectButton = (props) => {
   const { t } = useTranslation();
   const { login, logout } = useAuth();
   //   console.log("login==", login);
-  const { onPresentConnectModal } = useWalletModal(
-    login,
-    logout,
-
-    t
-  );
+  const { onPresentConnectModal } = useWalletModal(login, logout, t);
 
   return (
     <Button onClick={onPresentConnectModal} {...props}>
