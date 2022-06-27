@@ -51,6 +51,7 @@ const Header = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const { account } = useWeb3React();
+  console.log("tt==", account);
   const { logout } = useAuth();
   //   const [anchorElNav, setAnchorElNav] = React.useState(null);
   //   const [anchorElUser, setAnchorElUser] = React.useState(null);

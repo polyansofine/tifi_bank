@@ -2,6 +2,8 @@ import { InjectedConnector } from "@web3-react/injected-connector";
 import { WalletConnectConnector } from "@web3-react/walletconnect-connector";
 import { BscConnector } from "@binance-chain/bsc-connector";
 import { ConnectorNames } from "@pancakeswap/uikit";
+import { ChainId } from "@pancakeswap/sdk";
+
 import getNodeUrl from "./getRpcUrl";
 import { ethers } from "ethers";
 const POLLING_INTERVAL = 12000;
@@ -23,6 +25,21 @@ export const connectorsByName = {
   [ConnectorNames.Injected]: injected,
   [ConnectorNames.WalletConnect]: walletconnect,
   [ConnectorNames.BSC]: bscConnector,
+  [ConnectorNames.Blocto]: async () => {
+    const { BloctoConnector } = await import("@blocto/blocto-connector");
+    return new BloctoConnector({ chainId, rpc: rpcUrl });
+  },
+  [ConnectorNames.WalletLink]: async () => {
+    const { WalletLinkConnector } = await import(
+      "@web3-react/walletlink-connector"
+    );
+    return new WalletLinkConnector({
+      url: rpcUrl,
+      appName: "PancakeSwap",
+      appLogoUrl: "https://pancakeswap.com/logo.png",
+      supportedChainIds: [ChainId.MAINNET, ChainId.TESTNET],
+    });
+  },
 };
 export const getLibrary = (provider) => {
   const library = new ethers.providers.Web3Provider(provider);
