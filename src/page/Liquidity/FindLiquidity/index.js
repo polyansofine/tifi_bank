@@ -26,6 +26,7 @@ import _ from "lodash";
 import { ethers } from "ethers";
 import { minABI } from "../../../config/TiFI_min_abi";
 import { useNavigate } from "react-router-dom";
+import SettingModal from "../../../components/SettingModal";
 
 const FindLiquidity = () => {
   const { token0, token1 } = useSelector(
@@ -41,6 +42,7 @@ const FindLiquidity = () => {
   const [pool1, setPool1] = useState();
   const [no_pool, setNoPool] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [openSetting, setOpenSetting] = useState(false);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -117,7 +119,7 @@ const FindLiquidity = () => {
           </Grid>
         </Grid>
         <Grid item>
-          <IconButton>
+          <IconButton onClick={() => setOpenSetting(true)}>
             {" "}
             <SettingsOutlinedIcon sx={{ color: "#c8b6ff" }} />
           </IconButton>
@@ -320,6 +322,10 @@ const FindLiquidity = () => {
         open={openModal}
         handleClose={() => setOpenModal(false)}
         token_index={token_index}
+      />
+      <SettingModal
+        open={openSetting}
+        handleClose={() => setOpenSetting(false)}
       />
     </StyledPaper>
   );

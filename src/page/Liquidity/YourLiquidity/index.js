@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { motion } from "framer-motion/dist/framer-motion";
 import {
   Box,
@@ -22,6 +22,7 @@ import RemovePad from "./RemovePad";
 import { useNavigate } from "react-router-dom";
 import * as liquidityActions from "../../../store/actions";
 import { TOKENS } from "../../../config/token";
+import SettingModal from "../../../components/SettingModal";
 
 const transition = {
   duration: 1,
@@ -45,6 +46,7 @@ const YourLiquidity = ({ loading }) => {
   const navigate = useNavigate();
   const theme = useTheme();
   const dispatch = useDispatch();
+  const [openSetting, setOpenSetting] = useState(false);
   return (
     <motion.div initial="exit" animate="enter" exit="exit">
       <motion.div variants={imageVariants}>
@@ -74,7 +76,7 @@ const YourLiquidity = ({ loading }) => {
                 </Grid>
                 <Grid item>
                   {" "}
-                  <IconButton>
+                  <IconButton onClick={() => setOpenSetting(true)}>
                     {" "}
                     <SettingsOutlinedIcon sx={{ color: "#c8b6ff" }} />
                   </IconButton>
@@ -159,6 +161,10 @@ const YourLiquidity = ({ loading }) => {
             </Button>
           </Grid>
         </StyledPaper>
+        <SettingModal
+          open={openSetting}
+          handleClose={() => setOpenSetting(false)}
+        />
       </motion.div>
     </motion.div>
   );

@@ -28,6 +28,7 @@ export const theme = createTheme({
           margin: 0;}
           input[type=number] {
   -moz-appearance: textfield;
+  
 }
         }
        

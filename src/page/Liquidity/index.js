@@ -40,6 +40,7 @@ import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import RouterABI from "../../config/abi/TiFiRouter.json";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { useNavigate } from "react-router-dom";
+import SettingModal from "../../components/SettingModal";
 
 let i = 0;
 const transition = {
@@ -80,6 +81,7 @@ const Liquidity = () => {
   const [allow1, setAllow1] = useState(false);
   const [available_balance, setAvailableBalance] = useState(true);
   const [status, setStatus] = useState(false);
+  const [openSetting, setOpenSetting] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -619,7 +621,7 @@ const Liquidity = () => {
               </IconButton>{" "}
               <StyledBtn>Liquidity</StyledBtn>
             </Grid>
-            <IconButton>
+            <IconButton onClick={() => setOpenSetting(true)}>
               {" "}
               <SettingsOutlinedIcon sx={{ color: "#c8b6ff" }} />
             </IconButton>
@@ -999,6 +1001,10 @@ const Liquidity = () => {
           open={openModal}
           handleClose={() => setOpenModal(false)}
           token_index={token_index}
+        />
+        <SettingModal
+          open={openSetting}
+          handleClose={() => setOpenSetting(false)}
         />
       </motion.div>
     </motion.div>

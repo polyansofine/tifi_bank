@@ -30,6 +30,7 @@ import { motion } from "framer-motion/dist/framer-motion";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import metamask from "../../assets/image/Metamask-icon.svg";
 import CachedIcon from "@mui/icons-material/Cached";
+import SettingModal from "../../components/SettingModal";
 
 const StyledPaper = styled(Paper)(({ theme, main }) => ({
   width: main ? 500 : "100%",
@@ -78,6 +79,7 @@ const Swap = () => {
   const [perPrice, setPerPrice] = useState([]);
   const [refresh, setRefresh] = useState(false);
   const dispatch = useDispatch();
+  const [settingModal, setSettingModal] = useState(false);
 
   const { address, provider } = useSelector(
     ({ authReducers }) => authReducers.auth.auth
@@ -101,6 +103,10 @@ const Swap = () => {
       getData();
     }
   }, [address, provider, token0, token1]);
+
+  const handleSettingClose = () => {
+    setSettingModal(false);
+  };
 
   const handleMax = async (index) => {
     if (index === 0) {
@@ -707,7 +713,10 @@ const Swap = () => {
     <motion.div initial="exit" animate="enter" exit="exit">
       <motion.div variants={imageVariants}>
         <StyledPaper main sx={{ position: "relative" }}>
-          <IconButton sx={{ position: "absolute", top: 6, right: 6 }}>
+          <IconButton
+            sx={{ position: "absolute", top: 6, right: 6 }}
+            onClick={() => setSettingModal(true)}
+          >
             <SettingsOutlinedIcon sx={{ color: "#c8b6ff" }} />
           </IconButton>
           <Typography variant="h6" sx={{ my: 2 }}>
@@ -1005,6 +1014,7 @@ const Swap = () => {
           handleClose={() => setOpen(false)}
           token_index={token_index}
         />
+        <SettingModal open={settingModal} handleClose={handleSettingClose} />
       </motion.div>
     </motion.div>
   );
