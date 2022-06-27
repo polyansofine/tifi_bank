@@ -17,11 +17,12 @@ import { connectorsByName } from "./web3React";
 // import { useAppDispatch } from "state";
 // import { useTranslation } from "contexts/Localization";
 import { setupNetwork } from "./wallet";
+import useActiveWeb3React from "./useActiveWeb3React";
 
 const useAuth = () => {
   // const { t } = useTranslation();
   // const dispatch = useAppDispatch();
-  const { activate, deactivate } = useWeb3React();
+  const { activate, deactivate } = useActiveWeb3React();
   // const { toastError } = useToast();
 
   const login = useCallback(
