@@ -14,7 +14,7 @@ const useActiveWeb3React = () => {
 
   return {
     library: library || simpleRpcProvider,
-    chainId: chainId ?? parseInt("56", 10),
+    chainId: chainId ?? parseInt("97", 10),
     ...web3React,
   };
 };
