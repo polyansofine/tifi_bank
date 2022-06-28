@@ -14,8 +14,10 @@ import {
   useMediaQuery,
   useTheme,
 } from "@mui/material";
-import React from "react";
+import React, { useState } from "react";
 import CloseIcon from "@mui/icons-material/Close";
+import * as settingActions from "../../store/actions";
+import { useDispatch, useSelector } from "react-redux";
 
 const StyledButton = styled(ButtonBase)(({ active, theme }) => ({
   height: "30px",
@@ -94,6 +96,10 @@ const IOSSwitch = styled((props) => (
 
 const SettingModal = ({ open, handleClose }) => {
   const theme = useTheme();
+  const { speed, tolerance, deadline, expert, multi, indicator } = useSelector(
+    ({ settingReducers }) => settingReducers.setting
+  );
+  const dispatch = useDispatch();
   //   const fullScreen = useMediaQuery(theme.breakpoints.down("md"));
   //   console.log("fullscreen=", fullScreen);
   return (
@@ -148,13 +154,28 @@ const SettingModal = ({ open, handleClose }) => {
         </Typography>
         <Grid container columnSpacing={2}>
           <Grid item>
-            <StyledButton active="true">Standard(5)</StyledButton>
+            <StyledButton
+              onClick={() => dispatch(settingActions.setSpeed(5))}
+              active={speed === 5 ? true : false}
+            >
+              Standard(5)
+            </StyledButton>
           </Grid>
           <Grid item>
-            <StyledButton>Fast(6)</StyledButton>
+            <StyledButton
+              active={speed === 6 ? true : false}
+              onClick={() => dispatch(settingActions.setSpeed(6))}
+            >
+              Fast(6)
+            </StyledButton>
           </Grid>
           <Grid item>
-            <StyledButton>Instant(7)</StyledButton>
+            <StyledButton
+              active={speed === 7 ? true : false}
+              onClick={() => dispatch(settingActions.setSpeed(7))}
+            >
+              Instant(7)
+            </StyledButton>
           </Grid>
         </Grid>
         <Divider sx={{ border: "1px solid #3B384C", my: 2 }} />
@@ -166,18 +187,39 @@ const SettingModal = ({ open, handleClose }) => {
         </Typography>
         <Grid container columnSpacing={1}>
           <Grid item>
-            <StyledButton>0.1%</StyledButton>
+            <StyledButton
+              active={tolerance === 0.1 ? true : false}
+              onClick={() => dispatch(settingActions.setTolerance(0.1))}
+            >
+              0.1%
+            </StyledButton>
           </Grid>
           <Grid item>
-            <StyledButton>0.5%</StyledButton>
+            <StyledButton
+              active={tolerance === 0.5 ? true : false}
+              onClick={() => dispatch(settingActions.setTolerance(0.5))}
+            >
+              0.5%
+            </StyledButton>
           </Grid>
           <Grid item>
-            <StyledButton active="true">1.0%</StyledButton>
+            <StyledButton
+              active={tolerance === 1 ? true : false}
+              onClick={() => dispatch(settingActions.setTolerance(1))}
+            >
+              1.0%
+            </StyledButton>
           </Grid>
           <Grid item>
             <Grid container justifyContent="center" columnSpacing={1}>
               <Grid item>
-                <StyledInput />
+                <StyledInput
+                  type="number"
+                  value={tolerance}
+                  onChange={(e) =>
+                    dispatch(settingActions.setTolerance(e.target.value))
+                  }
+                />
               </Grid>
               <Grid item>
                 <Typography sx={{ color: "#1FC7D3" }}>%</Typography>
@@ -190,7 +232,13 @@ const SettingModal = ({ open, handleClose }) => {
             <Typography sx={{ color: "#ffffff" }}>Tx deadline(mins)</Typography>
           </Grid>
           <Grid item>
-            <StyledInput defaultValue={20} />
+            <StyledInput
+              value={deadline}
+              type="number"
+              onChange={(e) =>
+                dispatch(settingActions.setDeadline(e.target.value))
+              }
+            />
           </Grid>
         </Grid>
         <Grid container justifyContent="space-between" sx={{ my: 2 }}>
@@ -198,7 +246,7 @@ const SettingModal = ({ open, handleClose }) => {
             <Typography sx={{ color: "#ffffff" }}>Expert Mode</Typography>
           </Grid>
           <Grid item>
-            <IOSSwitch />
+            <IOSSwitch checked={expert} />
           </Grid>
         </Grid>
         <Grid container justifyContent="space-between" sx={{ my: 2 }}>
@@ -206,7 +254,7 @@ const SettingModal = ({ open, handleClose }) => {
             <Typography sx={{ color: "#ffffff" }}>Disable Multihops</Typography>
           </Grid>
           <Grid item>
-            <IOSSwitch />
+            <IOSSwitch checked={multi} />
           </Grid>
         </Grid>
         <Grid container justifyContent="space-between" sx={{ my: 2 }}>
@@ -216,7 +264,7 @@ const SettingModal = ({ open, handleClose }) => {
             </Typography>
           </Grid>
           <Grid item>
-            <IOSSwitch />
+            <IOSSwitch checked={indicator} />
           </Grid>
         </Grid>
       </DialogContent>

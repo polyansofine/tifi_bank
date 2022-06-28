@@ -68,12 +68,12 @@ const YourLiquidity = ({ loading }) => {
                 alignItems="center"
                 columnSpacing={2}
               >
-                <Grid item>
+                {/* <Grid item>
                   <IconButton>
                     {" "}
                     <RestoreIcon sx={{ color: "#c8b6ff" }} />
                   </IconButton>
-                </Grid>
+                </Grid> */}
                 <Grid item>
                   {" "}
                   <IconButton onClick={() => setOpenSetting(true)}>
