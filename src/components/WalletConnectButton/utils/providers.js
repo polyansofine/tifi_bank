@@ -1,3 +1,4 @@
+/* eslint-disable import/no-anonymous-default-export */
 import { StaticJsonRpcProvider } from "@ethersproject/providers";
 import getRpcUrl from "./getRpcUrl";
 

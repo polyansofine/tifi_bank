@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import * as React from "react";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
@@ -10,17 +11,10 @@ import Container from "@mui/material/Container";
 import Button from "@mui/material/Button";
 
 import logo from "../../assets/image/TiFi.png";
-import {
-  List,
-  ListItemButton,
-  Menu,
-  MenuItem,
-  Popover,
-  useTheme,
-} from "@mui/material";
+import { Menu, MenuItem, useTheme } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import WalletConnectButton from "../../components/WalletConnectButton";
-import useTranslation from "../../context/Localization/useTranslation";
+// import useTranslation from "../../context/Localization/useTranslation";
 import { useWeb3React } from "@web3-react/core";
 import useAuth from "../../components/WalletConnectButton/utils/useAuth";
 import { useDispatch } from "react-redux";
@@ -60,12 +54,12 @@ const pages = [
     ],
   },
 ];
-const settings = ["Home", "Account", "Dashboard", "Logout"];
+// const settings = ["Home", "Account", "Dashboard", "Logout"];
 
 const Header = () => {
   const theme = useTheme();
   const navigate = useNavigate();
-  const { t } = useTranslation();
+  // const { t } = useTranslation();
   const { account, library } = useWeb3React();
   const dispatch = useDispatch();
   React.useEffect(() => {
@@ -88,7 +82,7 @@ const Header = () => {
     setAnchorEl(null);
   };
 
-  const open = Boolean(anchorEl);
+  // const open = Boolean(anchorEl);
   //   const [anchorElNav, setAnchorElNav] = React.useState(null);
   //   const [anchorElUser, setAnchorElUser] = React.useState(null);
 
@@ -127,11 +121,10 @@ const Header = () => {
             TiFi Bank
           </Typography>
           <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}>
-            {pages.map((page) =>
+            {pages.map((page, index) =>
               page.subtitle ? (
-                <>
+                <React.Fragment key={index}>
                   <Button
-                    key={page}
                     onClick={() => navigate(`${page.url}`)}
                     sx={{ my: 1, px: 4 }}
                     endIcon={<KeyboardArrowDownIcon />}
@@ -187,10 +180,10 @@ const Header = () => {
                       </MenuItem>
                     ))}
                   </Menu>
-                </>
+                </React.Fragment>
               ) : (
                 <Button
-                  key={page}
+                  key={index}
                   onClick={() => navigate(`${page.url}`)}
                   sx={{ my: 1, px: 4, display: "block" }}
                 >

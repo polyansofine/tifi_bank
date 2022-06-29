@@ -1,4 +1,4 @@
-import { TOKENS } from "../../../config/token";
+// import { TOKENS } from "../../../config/token";
 import * as tokenActions from "../../actions";
 
 const initialState = {

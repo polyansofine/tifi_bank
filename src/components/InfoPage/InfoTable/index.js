@@ -109,14 +109,7 @@ const headCells = [
 ];
 
 function EnhancedTableHead(props) {
-  const {
-    onSelectAllClick,
-    order,
-    orderBy,
-    numSelected,
-    rowCount,
-    onRequestSort,
-  } = props;
+  const { order, orderBy, onRequestSort } = props;
   const createSortHandler = (property) => (event) => {
     onRequestSort(event, property);
   };
@@ -170,12 +163,12 @@ function EnhancedTableHead(props) {
 }
 
 EnhancedTableHead.propTypes = {
-  numSelected: PropTypes.number.isRequired,
+  //   numSelected: PropTypes.number.isRequired,
   onRequestSort: PropTypes.func.isRequired,
-  onSelectAllClick: PropTypes.func.isRequired,
+  //   onSelectAllClick: PropTypes.func.isRequired,
   order: PropTypes.oneOf(["asc", "desc"]).isRequired,
   orderBy: PropTypes.string.isRequired,
-  rowCount: PropTypes.number.isRequired,
+  //   rowCount: PropTypes.number.isRequired,
 };
 
 const EnhancedTableToolbar = (props) => {
@@ -225,7 +218,7 @@ EnhancedTableToolbar.propTypes = {
 export default function InfoTable() {
   const [order, setOrder] = React.useState("asc");
   const [orderBy, setOrderBy] = React.useState("calories");
-  const [selected, setSelected] = React.useState([]);
+  //   const [selected, setSelected] = React.useState([]);
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
   const navigate = useNavigate();
@@ -258,7 +251,7 @@ export default function InfoTable() {
     setPage(0);
   };
 
-  const isSelected = (name) => selected.indexOf(name) !== -1;
+  //   const isSelected = (name) => selected.indexOf(name) !== -1;
 
   // Avoid a layout jump when reaching the last page with empty rows.
   const emptyRows =
@@ -267,7 +260,7 @@ export default function InfoTable() {
   return (
     <Box sx={{ width: "100%", mt: 4 }}>
       {/* <Paper sx={{ width: "100%", mb: 2,backgroud:'' }}> */}
-      <EnhancedTableToolbar numSelected={selected.length} />
+      <EnhancedTableToolbar />
       <TableContainer sx={{ border: "1px solid #445760", borderRadius: 4 }}>
         <Table
           sx={{
@@ -276,7 +269,7 @@ export default function InfoTable() {
           aria-labelledby="tableTitle"
         >
           <EnhancedTableHead
-            numSelected={selected.length}
+            // numSelected={selected.length}
             order={order}
             orderBy={orderBy}
             // onSelectAllClick={handleSelectAllClick}
@@ -289,7 +282,7 @@ export default function InfoTable() {
             {stableSort(rows, getComparator(order, orderBy))
               .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
               .map((row, index) => {
-                const isItemSelected = isSelected(row.name);
+                // const isItemSelected = isSelected(row.name);
                 const labelId = `enhanced-table-checkbox-${index}`;
 
                 return (
@@ -297,11 +290,11 @@ export default function InfoTable() {
                     hover
                     onClick={(event) => handleClick(event, row.token)}
                     role="checkbox"
-                    aria-checked={isItemSelected}
+                    // aria-checked={isItemSelected}
                     tabIndex={-1}
-                    key={row.name}
+                    key={index}
                     sx={{ cursor: "pointer" }}
-                    selected={isItemSelected}
+                    // selected={isItemSelected}
                   >
                     {/* <TableCell padding="checkbox">
                         <Checkbox

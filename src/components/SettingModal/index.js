@@ -1,5 +1,5 @@
+/* eslint-disable no-unused-vars */
 import {
-  Button,
   ButtonBase,
   Dialog,
   DialogContent,
@@ -11,10 +11,9 @@ import {
   styled,
   Switch,
   Typography,
-  useMediaQuery,
   useTheme,
 } from "@mui/material";
-import React, { useState } from "react";
+import React from "react";
 import CloseIcon from "@mui/icons-material/Close";
 import * as settingActions from "../../store/actions";
 import { useDispatch, useSelector } from "react-redux";

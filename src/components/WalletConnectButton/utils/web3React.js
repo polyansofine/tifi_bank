@@ -6,7 +6,6 @@ import { ChainId } from "@pancakeswap/sdk";
 import { Web3Provider } from "@ethersproject/providers";
 
 import getNodeUrl from "./getRpcUrl";
-import { ethers } from "ethers";
 const POLLING_INTERVAL = 12000;
 const rpcUrl = getNodeUrl();
 const chainId = parseInt("97", 10);

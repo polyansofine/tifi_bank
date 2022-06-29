@@ -1,3 +1,4 @@
+/* eslint-disable eqeqeq */
 import { Avatar, AvatarGroup, Grid, Typography } from "@mui/material";
 import _ from "lodash";
 import React, { useEffect, useState } from "react";
@@ -14,7 +15,7 @@ const DetailPage = () => {
       setToken(_.find(LP_TOKENS, (o) => o.address == address));
     }
   }, [address]);
-  console.log("address==", token);
+  //   console.log("address==", token);
   return (
     <InfoLayout
       title={

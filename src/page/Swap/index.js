@@ -1,3 +1,5 @@
+/* eslint-disable eqeqeq */
+/* eslint-disable react-hooks/exhaustive-deps */
 import {
   Paper,
   Typography,
@@ -32,7 +34,7 @@ import metamask from "../../assets/image/Metamask-icon.svg";
 import CachedIcon from "@mui/icons-material/Cached";
 import SettingModal from "../../components/SettingModal";
 
-const StyledPaper = styled(Paper)(({ theme, main }) => ({
+const StyledPaper = styled(Paper)(({ main }) => ({
   width: main ? 500 : "100%",
   padding: "10px 18px",
   border: main ? "#055080 1px solid" : "#343a40 1px solid",
@@ -44,7 +46,7 @@ const StyledPaper = styled(Paper)(({ theme, main }) => ({
   },
 }));
 
-const StyleInput = styled(InputBase)(({ theme }) => ({
+const StyleInput = styled(InputBase)(() => ({
   // width: "16ch",
   fontWeight: 800,
   fontSize: "24px",
@@ -606,7 +608,6 @@ const Swap = () => {
         function () {
           console.log("Async: Copying to clipboard was successful!");
           setCopy(index === 0 ? 0 : 1);
-          const timer = setTimeout(() => setCopy(false), 1000);
         },
         function (err) {
           console.error("Async: Could not copy text: ", err);

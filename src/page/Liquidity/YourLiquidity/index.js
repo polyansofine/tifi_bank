@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion/dist/framer-motion";
 import {
-  Box,
   Button,
   Fab,
   Grid,
@@ -14,11 +13,9 @@ import {
   StyledPaper,
 } from "../../../components/LiquidityComponents/StyledPaper";
 import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
-import RestoreIcon from "@mui/icons-material/Restore";
 import { useDispatch, useSelector } from "react-redux";
 import AddIcon from "@mui/icons-material/Add";
 import YourPool from "./YourPool";
-import RemovePad from "./RemovePad";
 import { useNavigate } from "react-router-dom";
 import * as liquidityActions from "../../../store/actions";
 import { TOKENS } from "../../../config/token";
@@ -37,12 +34,10 @@ const imageVariants = {
   },
 };
 const YourLiquidity = ({ loading }) => {
-  const { address, provider } = useSelector(
-    ({ authReducers }) => authReducers.auth.auth
-  );
-  const { balances } = useSelector(
-    ({ tokenReducers }) => tokenReducers.liquidity
-  );
+  const { address } = useSelector(({ authReducers }) => authReducers.auth.auth);
+  // const { balances } = useSelector(
+  //   ({ tokenReducers }) => tokenReducers.liquidity
+  // );
   const navigate = useNavigate();
   const theme = useTheme();
   const dispatch = useDispatch();

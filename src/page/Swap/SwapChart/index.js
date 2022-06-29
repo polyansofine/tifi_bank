@@ -1,5 +1,6 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import _ from "../../../utils/@lodash";
-import { styled, ThemeProvider, useTheme, alpha } from "@mui/material/styles";
+import { useTheme, alpha } from "@mui/material/styles";
 import Tab from "@mui/material/Tab";
 import Tabs from "@mui/material/Tabs";
 import Typography from "@mui/material/Typography";
@@ -12,12 +13,12 @@ import * as chartActions from "../../../store/actions";
 import { StyledPaper } from "../../../components/LiquidityComponents/StyledPaper";
 // import moment from "moment";
 
-const Root = styled("div")(({ theme }) => ({
-  background: `linear-gradient(to right, ${theme.palette.primary.dark} 0%, ${theme.palette.primary.main} 100%)`,
-  color: theme.palette.primary.contrastText,
-  padding: 20,
-  width: "100%",
-}));
+// const Root = styled("div")(({ theme }) => ({
+//   background: `linear-gradient(to right, ${theme.palette.primary.dark} 0%, ${theme.palette.primary.main} 100%)`,
+//   color: theme.palette.primary.contrastText,
+//   padding: 20,
+//   width: "100%",
+// }));
 const formatter = Intl.NumberFormat("en", { notation: "scientific" });
 // const tabs = ['24H', '7D', '14D', '30D', '90D', '180D', '1Y', 'ALL'];
 const tabs = [
@@ -149,7 +150,7 @@ function SwapChart() {
     ({ tokenReducers }) => tokenReducers.token
   );
 
-  const { prices, market_caps, total_volumes } = useSelector(
+  const { prices, market_caps } = useSelector(
     ({ tokenReducers }) => tokenReducers.chart.chart
   );
   const [index, setIndex] = useState("prices");

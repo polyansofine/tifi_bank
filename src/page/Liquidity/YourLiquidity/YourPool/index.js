@@ -1,3 +1,4 @@
+/* eslint-disable eqeqeq */
 import * as React from "react";
 import Accordion from "@mui/material/Accordion";
 import AccordionSummary from "@mui/material/AccordionSummary";
@@ -18,7 +19,7 @@ export default function YourPool({ loading }) {
   const { balances } = useSelector(
     ({ tokenReducers }) => tokenReducers.liquidity
   );
-  const { address, provider } = useSelector(
+  const { provider } = useSelector(
     ({ authReducers }) => authReducers.auth.auth
   );
   const dispatch = useDispatch();

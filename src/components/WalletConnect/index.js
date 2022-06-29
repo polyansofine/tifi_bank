@@ -1,3 +1,6 @@
+/* eslint-disable eqeqeq */
+/* eslint-disable no-unused-vars */
+/* eslint-disable react-hooks/exhaustive-deps */
 import { Button, useTheme } from "@mui/material";
 import { ethers } from "ethers";
 import React, { useEffect, useState } from "react";

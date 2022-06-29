@@ -1,15 +1,13 @@
+/* eslint-disable eqeqeq */
+/* eslint-disable react-hooks/exhaustive-deps */
 import {
   Alert,
   Button,
   CircularProgress,
   ClickAwayListener,
   Collapse,
-  Fab,
   Grid,
   IconButton,
-  Paper,
-  styled,
-  TextField,
   Tooltip,
   Typography,
   useTheme,
@@ -42,7 +40,6 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { useNavigate } from "react-router-dom";
 import SettingModal from "../../components/SettingModal";
 
-let i = 0;
 const transition = {
   duration: 1,
   ease: [0.43, 0.13, 0.23, 0.96],
@@ -318,7 +315,7 @@ const Liquidity = () => {
         function () {
           console.log("Async: Copying to clipboard was successful!");
           setCopy(index === 0 ? 0 : 1);
-          const timer = setTimeout(() => setCopy(false), 1000);
+          setTimeout(() => setCopy(false), 1000);
         },
         function (err) {
           console.error("Async: Could not copy text: ", err);

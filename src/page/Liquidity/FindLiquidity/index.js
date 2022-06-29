@@ -1,3 +1,5 @@
+/* eslint-disable eqeqeq */
+/* eslint-disable react-hooks/exhaustive-deps */
 import {
   Box,
   Button,
@@ -9,10 +11,7 @@ import {
   Typography,
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
-import {
-  StyledInnerPaper,
-  StyledPaper,
-} from "./../../../components/LiquidityComponents/StyledPaper";
+import { StyledPaper } from "./../../../components/LiquidityComponents/StyledPaper";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
 import { useDispatch, useSelector } from "react-redux";
@@ -22,7 +21,7 @@ import * as liquidityActions from "../../../store/actions";
 import { TOKENS } from "../../../config/token";
 import TokenSearchModal from "../../Swap/TokenSearchModal";
 import { LP_TOKENS } from "../../../config/LP_tokens";
-import _ from "lodash";
+
 import { ethers } from "ethers";
 import { minABI } from "../../../config/TiFI_min_abi";
 import { useNavigate } from "react-router-dom";
