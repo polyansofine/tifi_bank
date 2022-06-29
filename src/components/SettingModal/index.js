@@ -246,7 +246,7 @@ const SettingModal = ({ open, handleClose }) => {
             <Typography sx={{ color: "#ffffff" }}>Expert Mode</Typography>
           </Grid>
           <Grid item>
-            <IOSSwitch checked={expert} />
+            <IOSSwitch />
           </Grid>
         </Grid>
         <Grid container justifyContent="space-between" sx={{ my: 2 }}>
@@ -254,7 +254,7 @@ const SettingModal = ({ open, handleClose }) => {
             <Typography sx={{ color: "#ffffff" }}>Disable Multihops</Typography>
           </Grid>
           <Grid item>
-            <IOSSwitch checked={multi} />
+            <IOSSwitch />
           </Grid>
         </Grid>
         <Grid container justifyContent="space-between" sx={{ my: 2 }}>
@@ -264,7 +264,7 @@ const SettingModal = ({ open, handleClose }) => {
             </Typography>
           </Grid>
           <Grid item>
-            <IOSSwitch checked={indicator} />
+            <IOSSwitch />
           </Grid>
         </Grid>
       </DialogContent>
