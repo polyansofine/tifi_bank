@@ -3,6 +3,7 @@ import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import FuseMessage from "../components/FuseMessage/FuseMessage";
 import InfoPage from "../components/InfoPage";
+import DetailPage from "../components/InfoPage/DetailPage";
 import Layout from "../Layout";
 import Home from "../page/Home";
 import LiquidityRouter from "../page/Liquidity/LiquidityRouter";
@@ -20,6 +21,7 @@ const Routers = () => {
             <Route path="/swap" element={<SwapPage />} />
             <Route path="/liquidity/*" element={<LiquidityRouter />} />
             <Route path="/pool_info" element={<InfoPage />} />
+            <Route path="/pool/:address" element={<DetailPage />} />
 
             {/* <Route path="/" element={<Home />} />
             <Route path="/" element={<Home />} />

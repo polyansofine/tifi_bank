@@ -6,7 +6,7 @@ const Layout = ({ children }) => {
   return (
     <div>
       <Header />
-      <Container sx={{ p: 4 }}>
+      <Container sx={{ mt: 16 }}>
         <Grid container justifyContent="center">
           <Grid item>{children}</Grid>
         </Grid>

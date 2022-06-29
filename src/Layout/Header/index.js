@@ -49,7 +49,7 @@ const pages = [
     url: "/lend",
   },
   {
-    title: "Pool Info",
+    title: "Info",
     url: "/pool",
     subtitle: [
       { title: "pool info", url: "/pool_info" },
@@ -108,7 +108,10 @@ const Header = () => {
   //   };
 
   return (
-    <AppBar position="static">
+    <AppBar
+      position="fixed"
+      sx={{ background: "rgba(22, 8, 45, 0.6)", backdropFilter: "blur(12px)" }}
+    >
       <Container maxWidth="xl">
         <Toolbar disableGutters>
           <img src={logo} alt="logo" width="40px" height="30px" />
@@ -174,7 +177,7 @@ const Header = () => {
                         sx={{
                           "&:hover": {
                             background: "rgba(3, 4, 20,0.6)",
-                            borderRadius: 1,
+                            borderRadius: 2,
                             color: "white",
                           },
                         }}

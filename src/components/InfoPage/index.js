@@ -1,8 +1,16 @@
-import { alpha, Container, InputAdornment, TextField } from "@mui/material";
+import {
+  alpha,
+  Container,
+  Grid,
+  InputAdornment,
+  TextField,
+  Typography,
+} from "@mui/material";
 import { makeStyles } from "@mui/styles";
 import React from "react";
 import InfoLayout from "./InfoLayout";
 import SearchIcon from "@mui/icons-material/Search";
+import InfoTable from "./InfoTable";
 const useStyles = makeStyles((theme) => ({
   input: {
     "& .MuiOutlinedInput-root": {
@@ -29,7 +37,17 @@ const useStyles = makeStyles((theme) => ({
 const InfoPage = () => {
   const classes = useStyles();
   return (
-    <InfoLayout title="helloworld">
+    <InfoLayout
+      title={
+        <Grid container direction="column">
+          <Typography variant="h4">Pool Analytics.</Typography>
+          <Typography>
+            Click on the column name to sort pairs by its TVL, volume, fees or
+            APY.
+          </Typography>
+        </Grid>
+      }
+    >
       <TextField
         fullWidth
         className={classes.input}
@@ -44,6 +62,7 @@ const InfoPage = () => {
           //   className: classes.input,
         }}
       />
+      <InfoTable />
     </InfoLayout>
   );
 };
