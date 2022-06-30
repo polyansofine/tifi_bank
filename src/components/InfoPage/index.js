@@ -33,17 +33,24 @@ const useStyles = makeStyles((theme) => ({
     },
   },
 }));
-const InfoPage = () => {
+const InfoPage = ({ info }) => {
   const classes = useStyles();
   return (
     <InfoLayout
       title={
         <Grid container direction="column">
-          <Typography variant="h4">Pool Analytics.</Typography>
-          <Typography>
-            Click on the column name to sort pairs by its TVL, volume, fees or
-            APY.
-          </Typography>
+          <Typography variant="h4">{info} Analytics.</Typography>
+          {info === "Token" ? (
+            <Typography>
+              Click on the column name to sort tokens by it's liquidity or
+              volume.
+            </Typography>
+          ) : (
+            <Typography>
+              Click on the column name to sort pairs by its TVL, volume, fees or
+              APY.
+            </Typography>
+          )}
         </Grid>
       }
     >
