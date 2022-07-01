@@ -11,6 +11,12 @@ const chart = (state = initialState, action) => {
         chart: action.payload,
       };
     }
+    case chartActions.GET_CHART_DATA_ERROR: {
+      return {
+        ...state,
+        chart: {},
+      };
+    }
 
     default:
       return state;

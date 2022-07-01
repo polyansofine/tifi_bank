@@ -11,6 +11,7 @@ import { useDispatch, useSelector } from "react-redux";
 import Box from "@mui/material/Box";
 import * as chartActions from "../../../store/actions";
 import { StyledPaper } from "../../../components/LiquidityComponents/StyledPaper";
+import { Grid } from "@mui/material";
 // import moment from "moment";
 
 // const Root = styled("div")(({ theme }) => ({
@@ -183,8 +184,8 @@ function SwapChart() {
     if (token0.title && token1.title) {
       dispatch(
         chartActions.getChartData(
-          token1,
           token0,
+          token1,
           tabs[tabValue].day,
           `${tabs[tabValue].interval}`
         )
@@ -195,9 +196,11 @@ function SwapChart() {
     if (prices) {
       // const temp = assetChart[`${index}`];
       const tempSeries = [
-        { name: "TiFi", data: index === "prices" ? prices : market_caps },
+        { name: token0.title, data: index === "prices" ? prices : market_caps },
       ];
       setSeries(tempSeries);
+    } else {
+      setSeries([]);
     }
   }, [index, prices]);
 
@@ -264,12 +267,23 @@ function SwapChart() {
         </div>
       </div>
       {/* <div className="container relative h-200 sm:h-256 pb-16"> */}
-      <ReactApexChart
-        options={options}
-        series={series}
-        type={options.chart.type}
-        height={options.chart.height}
-      />
+      {series.length > 0 ? (
+        <ReactApexChart
+          options={options}
+          series={series}
+          type={options.chart.type}
+          height={options.chart.height}
+        />
+      ) : (
+        <Grid
+          container
+          alignItems="center"
+          justifyContent="center"
+          sx={{ height: "300px" }}
+        >
+          <Typography>No data</Typography>
+        </Grid>
+      )}
       {/* </div> */}
     </StyledPaper>
     // </ThemeProvider>
