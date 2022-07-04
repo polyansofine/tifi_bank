@@ -68,7 +68,7 @@ const InfoPage = ({ info }) => {
           //   className: classes.input,
         }}
       />
-      <InfoTable />
+      <InfoTable info={info} />
     </InfoLayout>
   );
 };

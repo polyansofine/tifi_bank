@@ -19,7 +19,12 @@ import ClearOutlinedIcon from "@mui/icons-material/ClearOutlined";
 import * as tokenActions from "../../../store/actions";
 import { useDispatch } from "react-redux";
 
-const TokenSearchModal = ({ open, handleClose, token_index }) => {
+const TokenSearchModal = ({
+  open,
+  handleClose,
+  token_index,
+  selectedToken,
+}) => {
   const dispatch = useDispatch();
 
   const SearchText = styled(TextField)(({ theme }) => ({
@@ -80,6 +85,7 @@ const TokenSearchModal = ({ open, handleClose, token_index }) => {
           {TOKENS.map((item, index) => (
             <ListItem
               key={index}
+              disabled={item.title === selectedToken}
               sx={{
                 "&: hover": {
                   background: "#3730A3",
@@ -87,13 +93,17 @@ const TokenSearchModal = ({ open, handleClose, token_index }) => {
                 },
               }}
               onClick={() => {
-                handleClose();
-                if (token_index == 1) {
-                  dispatch(tokenActions.selectToken(null, item));
-                  dispatch(tokenActions.setTokens({}, item));
+                if (item.title === selectedToken) {
+                  return 0;
                 } else {
-                  dispatch(tokenActions.selectToken(item, null));
-                  dispatch(tokenActions.setTokens(item, {}));
+                  handleClose();
+                  if (token_index == 1) {
+                    dispatch(tokenActions.selectToken(null, item));
+                    dispatch(tokenActions.setTokens({}, item));
+                  } else {
+                    dispatch(tokenActions.selectToken(item, null));
+                    dispatch(tokenActions.setTokens(item, {}));
+                  }
                 }
               }}
             >

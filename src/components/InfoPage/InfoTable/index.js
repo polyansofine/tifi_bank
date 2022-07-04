@@ -17,6 +17,7 @@ import { visuallyHidden } from "@mui/utils";
 import { Avatar, AvatarGroup, Grid } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { LP_TOKENS } from "../../../config/LP_tokens";
+import { TOKENS } from "../../../config/token";
 
 function createData(token, calories, fat, carbs, protein) {
   return {
@@ -29,7 +30,7 @@ function createData(token, calories, fat, carbs, protein) {
   };
 }
 
-const rows = [
+const lp_tokens = [
   createData(LP_TOKENS[0], 305, 3.7, 67, 4.3),
   createData(LP_TOKENS[1], 452, 25.0, 51, 4.9),
   createData(LP_TOKENS[1], 262, 16.0, 24, 6.0),
@@ -43,6 +44,21 @@ const rows = [
   createData(LP_TOKENS[0], 318, 0, 81, 2.0),
   createData(LP_TOKENS[0], 360, 19.0, 9, 37.0),
   createData(LP_TOKENS[0], 437, 18.0, 63, 4.0),
+];
+const tokens = [
+  createData(TOKENS[0], 305, 3.7, 67, 4.3),
+  createData(TOKENS[1], 452, 25.0, 51, 4.9),
+  createData(TOKENS[2], 262, 16.0, 24, 6.0),
+  createData(TOKENS[1], 159, 6.0, 24, 4.0),
+  createData(TOKENS[0], 356, 16.0, 49, 3.9),
+  createData(TOKENS[0], 408, 3.2, 87, 6.5),
+  createData(TOKENS[1], 237, 9.0, 37, 4.3),
+  createData(TOKENS[0], 375, 0.0, 94, 0.0),
+  createData(TOKENS[1], 518, 26.0, 65, 7.0),
+  createData(TOKENS[2], 392, 0.2, 98, 0.0),
+  createData(TOKENS[0], 318, 0, 81, 2.0),
+  createData(TOKENS[2], 360, 19.0, 9, 37.0),
+  createData(TOKENS[0], 437, 18.0, 63, 4.0),
 ];
 
 function descendingComparator(a, b, orderBy) {
@@ -215,19 +231,23 @@ EnhancedTableToolbar.propTypes = {
   numSelected: PropTypes.number.isRequired,
 };
 
-export default function InfoTable() {
+export default function InfoTable({ info }) {
   const [order, setOrder] = React.useState("asc");
   const [orderBy, setOrderBy] = React.useState("calories");
   //   const [selected, setSelected] = React.useState([]);
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
   const navigate = useNavigate();
-
+  const [rows, setRows] = React.useState(info === "Token" ? tokens : lp_tokens);
+  // console.log("rows==", rows);
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === "asc";
     setOrder(isAsc ? "desc" : "asc");
     setOrderBy(property);
   };
+  React.useEffect(() => {
+    setRows(info === "Token" ? tokens : lp_tokens);
+  }, [info]);
 
   //   const handleSelectAllClick = (event) => {
   //     if (event.target.checked) {
@@ -238,8 +258,12 @@ export default function InfoTable() {
   //     setSelected([]);
   //   };
 
-  const handleClick = (event, token) => {
-    navigate(`../pool/${token.address}`);
+  const handleClick = (event, token, info) => {
+    if (info === "Token") {
+      navigate(`../token/${token.address}`);
+    } else {
+      navigate(`../pool/${token.address}`);
+    }
   };
 
   const handleChangePage = (event, newPage) => {
@@ -288,7 +312,7 @@ export default function InfoTable() {
                 return (
                   <TableRow
                     hover
-                    onClick={(event) => handleClick(event, row.token)}
+                    onClick={(event) => handleClick(event, row.token, info)}
                     role="checkbox"
                     // aria-checked={isItemSelected}
                     tabIndex={-1}
@@ -321,21 +345,32 @@ export default function InfoTable() {
                     >
                       <Grid container alignItems="center" columnSpacing={2}>
                         <Grid item>
-                          <AvatarGroup>
+                          {info === "Token" ? (
                             <Avatar
-                              alt={row.token.token0_name}
-                              src={`/images/tokens/${row.token.token0_address}.png`}
+                              alt={row.token.title}
+                              src={`/images/tokens/${row.token.address}.png`}
                             />
-                            <Avatar
-                              alt={row.token1_name}
-                              src={`/images/tokens/${row.token.token1_address}.png`}
-                            />
-                          </AvatarGroup>
+                          ) : (
+                            <AvatarGroup>
+                              <Avatar
+                                alt={row.token.token0_name}
+                                src={`/images/tokens/${row.token.token0_address}.png`}
+                              />
+                              <Avatar
+                                alt={row.token1_name}
+                                src={`/images/tokens/${row.token.token1_address}.png`}
+                              />
+                            </AvatarGroup>
+                          )}
                         </Grid>
                         <Grid item>
-                          <Typography>
-                            {row.token.token0_name}/{row.token.token1_name}
-                          </Typography>
+                          {info === "Token" ? (
+                            <Typography>{row.token.title}</Typography>
+                          ) : (
+                            <Typography>
+                              {row.token.token0_name}/{row.token.token1_name}
+                            </Typography>
+                          )}
                         </Grid>
                       </Grid>
                     </TableCell>

@@ -82,6 +82,7 @@ const Swap = () => {
   const [refresh, setRefresh] = useState(false);
   const dispatch = useDispatch();
   const [settingModal, setSettingModal] = useState(false);
+  const [selectedToken, setSelectedToken] = useState();
 
   const { address, provider } = useSelector(
     ({ authReducers }) => authReducers.auth.auth
@@ -735,6 +736,7 @@ const Swap = () => {
                   onClick={() => {
                     setOpen(true);
                     setTokenIndex(0);
+                    setSelectedToken(token0.title);
                   }}
                   src={`/images/tokens/${token0.address}.png`}
                 >
@@ -848,6 +850,7 @@ const Swap = () => {
                   onClick={() => {
                     setOpen(true);
                     setTokenIndex(1);
+                    setSelectedToken(token0.title);
                   }}
                   src={`/images/tokens/${token1.address}.png`}
                 >
@@ -1011,6 +1014,7 @@ const Swap = () => {
           )}
         </StyledPaper>
         <TokenSearchModal
+          selectedToken={selectedToken}
           open={open}
           handleClose={() => setOpen(false)}
           token_index={token_index}
