@@ -1015,6 +1015,7 @@ const Swap = () => {
         </StyledPaper>
         <TokenSearchModal
           selectedToken={selectedToken}
+          type="swap"
           open={open}
           handleClose={() => setOpen(false)}
           token_index={token_index}
