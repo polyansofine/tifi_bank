@@ -111,13 +111,20 @@ const DetailPage = ({ info }) => {
             </Grid>
           }
         >
-          <Grid container spacing={4}>
+          <Grid container spacing={4} sx={{ mb: 4 }}>
             <Grid item md={6}>
               <ItemDetail>
                 <InfoChart />
               </ItemDetail>
             </Grid>
             <Grid item md={6}>
+              <ItemDetail>
+                <InfoChart />
+              </ItemDetail>
+            </Grid>
+          </Grid>
+          <Grid container>
+            <Grid item md={12}>
               <ItemDetail>
                 <InfoChart />
               </ItemDetail>
