@@ -3,7 +3,7 @@ import * as tokenActions from "../../actions";
 
 const initialState = {
   token0: TOKENS[0],
-  token1: TOKENS[2],
+  token1: TOKENS[1],
   reserve0: null,
   reserve1: null,
 };

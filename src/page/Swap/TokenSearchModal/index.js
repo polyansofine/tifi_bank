@@ -104,7 +104,7 @@ const TokenSearchModal = ({
         }}
       >
         <List>
-          {type === "swap"
+          {/* {type === "swap"
             ? selectedToken &&
               filterFunc(TOKENS, selectedToken).map((item, index) => (
                 <ListItem
@@ -148,46 +148,54 @@ const TokenSearchModal = ({
                     </Grid>
                   </Grid>
                 </ListItem>
-              ))
-            : TOKENS.map((item, index) => (
-                <ListItem
-                  key={index}
-                  // disabled={_LP}
-                  sx={{
-                    "&: hover": {
-                      background: "#3730A3",
-                      borderRadius: 2,
-                    },
-                  }}
-                  onClick={() => {
-                    handleClose();
-                    if (token_index == 1) {
-                      dispatch(tokenActions.selectToken(null, item));
-                      dispatch(tokenActions.setTokens({}, item));
+              )) */}
+          {TOKENS.map((item, index) => (
+            <ListItem
+              key={index}
+              disabled={token_index === 1 && item.title === selectedToken}
+              sx={{
+                "&: hover": {
+                  background: "#3730A3",
+                  borderRadius: 2,
+                },
+              }}
+              onClick={() => {
+                handleClose();
+                if (token_index == 1) {
+                  dispatch(tokenActions.selectToken(null, item));
+                  dispatch(tokenActions.setTokens({}, item));
+                } else {
+                  if (item.title === token1.title) {
+                    if (item.title === "BNB") {
+                      dispatch(tokenActions.selectToken(item, TOKENS[1]));
+                      dispatch(tokenActions.setTokens(item, TOKENS[1]));
                     } else {
-                      dispatch(tokenActions.selectToken(item, null));
-                      dispatch(tokenActions.setTokens(item, {}));
+                      dispatch(tokenActions.selectToken(item, TOKENS[0]));
+                      dispatch(tokenActions.setTokens(item, TOKENS[0]));
                     }
-                  }}
-                >
-                  <Grid container alignItems="center" spacing={2}>
-                    <Grid item>
-                      <img
-                        width="35px"
-                        height="35px"
-                        src={`/images/tokens/${item.address}.png`}
-                        alt={item.title}
-                      />
-                    </Grid>
-                    <Grid item>
-                      <Typography variant="caption">
-                        {item.description}
-                      </Typography>
-                      <Typography>{item.title}</Typography>
-                    </Grid>
-                  </Grid>
-                </ListItem>
-              ))}
+                  } else {
+                    dispatch(tokenActions.selectToken(item, null));
+                    dispatch(tokenActions.setTokens(item, {}));
+                  }
+                }
+              }}
+            >
+              <Grid container alignItems="center" spacing={2}>
+                <Grid item>
+                  <img
+                    width="35px"
+                    height="35px"
+                    src={`/images/tokens/${item.address}.png`}
+                    alt={item.title}
+                  />
+                </Grid>
+                <Grid item>
+                  <Typography variant="caption">{item.description}</Typography>
+                  <Typography>{item.title}</Typography>
+                </Grid>
+              </Grid>
+            </ListItem>
+          ))}
         </List>
         <Typography sx={{ color: "white" }}></Typography>
       </DialogContent>

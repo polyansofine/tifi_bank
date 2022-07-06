@@ -33,6 +33,7 @@ import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import metamask from "../../assets/image/Metamask-icon.svg";
 import CachedIcon from "@mui/icons-material/Cached";
 import SettingModal from "../../components/SettingModal";
+import { bnb_address, TOKENS } from "../../config/token";
 
 const StyledPaper = styled(Paper)(({ main }) => ({
   width: main ? 500 : "100%",
@@ -176,16 +177,41 @@ const Swap = () => {
       getPrice.abi,
       signer
     );
-    const perPrice0 = await contractPrice.getTokenPriceUsingAmount(
-      address0,
-      address1,
-      (10 ** 18).toString()
-    );
-    const perPrice1 = await contractPrice.getTokenPriceUsingAmount(
-      address1,
-      address0,
-      (10 ** 18).toString()
-    );
+    let perPrice0;
+    let perPrice1;
+    if (address0 === bnb_address || address1 === bnb_address) {
+      perPrice0 = await contractPrice.getTokenPriceUsingAmount(
+        address0,
+        address1,
+        (10 ** 18).toString()
+      );
+      perPrice1 = await contractPrice.getTokenPriceUsingAmount(
+        address1,
+        address0,
+        (10 ** 18).toString()
+      );
+    } else {
+      let TempPerPrice0 = await contractPrice.getTokenPriceUsingAmount(
+        address0,
+        bnb_address,
+        (10 ** 18).toString()
+      );
+      perPrice0 = await contractPrice.getTokenPriceUsingAmount(
+        bnb_address,
+        address1,
+        TempPerPrice0.toString()
+      );
+      let TempPerPrice1 = await contractPrice.getTokenPriceUsingAmount(
+        address1,
+        bnb_address,
+        (10 ** 18).toString()
+      );
+      perPrice1 = await contractPrice.getTokenPriceUsingAmount(
+        bnb_address,
+        address0,
+        TempPerPrice1.toString()
+      );
+    }
     console.log("price===", perPrice1 / 10 ** 18);
     let tmpPrices = [
       Math.round((perPrice0 / 10 ** 18) * 10 ** 9) / 10 ** 9,
@@ -343,11 +369,26 @@ const Swap = () => {
         }
         try {
           if (addresfrom === token0.address) {
-            const PriveVal = await contractPrice.getTokenPriceUsingAmount(
-              addresfrom,
-              token1.address,
-              _amount
-            );
+            let PriveVal;
+            if (token0.title === "BNB" || token1.title === "BNB") {
+              PriveVal = await contractPrice.getTokenPriceUsingAmount(
+                addresfrom,
+                token1.address,
+                _amount
+              );
+            } else {
+              let TempPriveVal = await contractPrice.getTokenPriceUsingAmount(
+                addresfrom,
+                bnb_address,
+                _amount
+              );
+
+              PriveVal = await contractPrice.getTokenPriceUsingAmount(
+                bnb_address,
+                token1.address,
+                TempPriveVal
+              );
+            }
 
             let token1AmountBuf;
             if (Number(PriveVal) <= 10000000000) {
@@ -358,11 +399,27 @@ const Swap = () => {
             setPrice1(token1AmountBuf);
             return token1AmountBuf;
           } else {
-            const PriveVal = await contractPrice.getTokenPriceUsingAmount(
-              addresfrom,
-              token0.address,
-              _amount
-            );
+            let PriveVal;
+            if (token0.title === "BNB" || token1.title === "BNB") {
+              PriveVal = await contractPrice.getTokenPriceUsingAmount(
+                addresfrom,
+                token0.address,
+                _amount
+              );
+            } else {
+              let TempPriveVal = await contractPrice.getTokenPriceUsingAmount(
+                addresfrom,
+                bnb_address,
+                _amount
+              );
+
+              PriveVal = await contractPrice.getTokenPriceUsingAmount(
+                bnb_address,
+                token0.address,
+                TempPriveVal
+              );
+            }
+
             let token0AmountBuf;
             if (Number(PriveVal) <= 10000000000) {
               token0AmountBuf = 0;
@@ -552,7 +609,7 @@ const Swap = () => {
                   await contractPrice.swapExactTokensForTokensSupportingFeeOnTransferTokens(
                     _amount,
                     0,
-                    [token0.address, token1.address],
+                    [token0.address, bnb_address, token1.address],
                     address,
                     deadline
                   );
