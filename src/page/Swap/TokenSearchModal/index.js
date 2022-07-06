@@ -160,6 +160,9 @@ const TokenSearchModal = ({
                 },
               }}
               onClick={() => {
+                if (token_index === 1 && item.title === selectedToken) {
+                  return 0;
+                }
                 handleClose();
                 if (token_index == 1) {
                   dispatch(tokenActions.selectToken(null, item));
